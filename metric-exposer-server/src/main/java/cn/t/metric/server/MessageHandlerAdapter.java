@@ -275,7 +275,7 @@ public class MessageHandlerAdapter {
         }
     }
 
-    public class HeartBeatMessageHandler implements MessageHandler  {
+    public static class HeartBeatMessageHandler implements MessageHandler  {
         @Override
         public boolean handle(ChannelContext channelContext, Object msg) throws Exception {
             if(msg instanceof HeartBeat) {
