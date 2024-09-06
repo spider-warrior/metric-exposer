@@ -33,6 +33,7 @@ public class MetricExposerClient {
     public void start() {
         try (Selector selector = Selector.open()) {
             while (loopRead) {
+                MetricCollector metricCollector = new MetricCollector();
                 try {
                     SocketChannel socketChannel = connect(serverHost, serverPort);
                     status = MetricExposerClientStatus.STARTED;
@@ -40,6 +41,9 @@ public class MetricExposerClient {
                     Map<String, Object> attrs = new HashMap<>();
                     attrs.put(ChannelAttrName.attrChannelContext, channelContext);
                     socketChannel.register(selector, SelectionKey.OP_READ, attrs);
+                    // 开启采集metric任务
+                    metricCollector.setChannelContext(channelContext);
+                    metricCollector.startTask();
                     while (loopRead) {
                         int count = selector.select(3000);
                         if(count > 0) {
@@ -55,6 +59,8 @@ public class MetricExposerClient {
                             ChannelUtil.close(key);
                         }
                     }
+                    //停止采集任务
+                    metricCollector.cancelTask();
                 }
             }
         } catch (Exception e) {
@@ -138,6 +144,10 @@ public class MetricExposerClient {
     public void releaseResource() {
         status = MetricExposerClientStatus.STOPPED;
         System.out.println("MetricExposerClient中止!");
+    }
+
+    public MetricExposerClientStatus getStatus() {
+        return status;
     }
 
     public MetricExposerClient(String serverHost, int serverPort) {
