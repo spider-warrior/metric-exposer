@@ -49,10 +49,10 @@ public class MetricExposerClient {
                     break;
                 } catch (Exception e) {
                     Set<SelectionKey> keySet = selector.keys();
-                    for (SelectionKey selectionKey : keySet) {
-                        if(selectionKey.isValid()) {
-                            System.out.println("cancel key: " + selectionKey);
-                            selectionKey.cancel();
+                    for (SelectionKey key : keySet) {
+                        if(key.isValid()) {
+                            System.out.printf("异常类型：%s, 详情: %s%n", e.getClass().getSimpleName(), e.getMessage());
+                            ChannelUtil.close(key);
                         }
                     }
                 }
@@ -124,7 +124,7 @@ public class MetricExposerClient {
         while (!socketChannel.finishConnect()) {
             LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(200));
         }
-        System.out.printf("连接已完成!(%s), timestamp: %d%n", socketChannel.getLocalAddress() + ":" + socketChannel.getRemoteAddress(), System.currentTimeMillis());
+        System.out.printf("连接已完成!, timestamp: %d%n", System.currentTimeMillis());
         return socketChannel;
     }
 
