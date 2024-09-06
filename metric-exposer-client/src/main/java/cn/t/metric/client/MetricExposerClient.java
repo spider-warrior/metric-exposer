@@ -53,7 +53,7 @@ public class MetricExposerClient {
                 } catch (Exception e) {
                     for (SelectionKey key : selector.keys()) {
                         if(key.isValid()) {
-                            System.out.printf("异常类型：%s, 详情: %s%n", e.getClass().getSimpleName(), e.getMessage());
+                            System.out.printf("异常类型：%s, iops: %d, channel: %s, 详情: %s%n", e.getClass().getSimpleName(), key.interestOps(), key.channel(), e.getMessage());
                             ChannelUtil.closeChannel(key);
                         }
                     }
