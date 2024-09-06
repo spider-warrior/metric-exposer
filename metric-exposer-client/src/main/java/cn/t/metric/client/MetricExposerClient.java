@@ -32,8 +32,8 @@ public class MetricExposerClient {
 
     public void start() {
         try (Selector selector = Selector.open()) {
+            MetricCollector metricCollector = new MetricCollector();
             while (loopRead) {
-                MetricCollector metricCollector = new MetricCollector();
                 try {
                     SocketChannel socketChannel = connect(serverHost, serverPort);
                     status = MetricExposerClientStatus.STARTED;
@@ -42,23 +42,25 @@ public class MetricExposerClient {
                     attrs.put(ChannelAttrName.attrChannelContext, channelContext);
                     socketChannel.register(selector, SelectionKey.OP_READ, attrs);
                     // 开启采集metric任务
-                    metricCollector.setChannelContext(channelContext);
-                    metricCollector.startTask();
+                    metricCollector.startTask(channelContext);
+                    // 循环读取消息
                     while (loopRead) {
                         int count = selector.select(3000);
                         if(count > 0) {
                             loopEvents(selector.selectedKeys());
                         }
                     }
-                    break;
                 } catch (Exception e) {
-                    Set<SelectionKey> keySet = selector.keys();
-                    for (SelectionKey key : keySet) {
+                    for (SelectionKey key : selector.keys()) {
                         if(key.isValid()) {
                             System.out.printf("异常类型：%s, 详情: %s%n", e.getClass().getSimpleName(), e.getMessage());
-                            ChannelUtil.close(key);
+                            ChannelUtil.closeChannel(key);
                         }
                     }
+                    if(loopRead) {
+                        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
+                    }
+                } finally {
                     //停止采集任务
                     metricCollector.cancelTask();
                 }

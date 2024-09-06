@@ -1,14 +1,14 @@
 package cn.t.metric.server;
 
 import cn.t.metric.common.constants.ChannelAttrName;
+import cn.t.metric.common.context.ChannelContext;
 import cn.t.metric.common.context.ChannelContextManager;
 import cn.t.metric.common.message.infos.SystemInfo;
-import cn.t.metric.common.message.metrics.*;
+import cn.t.metric.common.message.metrics.SystemMetric;
+import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.MsgDecoder;
-import cn.t.metric.common.context.ChannelContext;
 import cn.t.metric.server.constants.MetricExposerServerStatus;
 import cn.t.metric.server.exception.MetricExposerServerException;
-import cn.t.metric.common.util.ChannelUtil;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -18,7 +18,10 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -76,7 +79,8 @@ public class MetricExposerServer {
                 handleEvent(key);
             } catch (Exception e) {
                 System.out.printf("异常类型：%s, 详情: %s%n", e.getClass().getSimpleName(), e.getMessage());
-                ChannelUtil.close(key);
+                manager.clearChannelContext(ChannelUtil.getChannelContext(key));
+                ChannelUtil.closeChannel(key);
             }
         }
     }

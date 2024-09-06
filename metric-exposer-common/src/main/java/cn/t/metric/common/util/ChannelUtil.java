@@ -24,7 +24,7 @@ public class ChannelUtil {
         return readBuffer;
     }
 
-    public static void close(SelectionKey key) {
+    public static void closeChannel(SelectionKey key) {
         key.cancel();
         Optional.ofNullable(getChannelContext(key)).ifPresent(ChannelContext::close);
     }
