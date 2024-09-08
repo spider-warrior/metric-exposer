@@ -44,9 +44,6 @@ public class ChannelUtil {
         }
     }
     public static synchronized void write(SocketChannel channel, ByteBuffer buffer) throws IOException {
-        if (!channel.isOpen() || !channel.isConnected()) {
-            throw new IOException("连接已关闭(open&connected)");
-        }
         buffer.flip();
         while (buffer.hasRemaining()) {
             channel.write(buffer);
