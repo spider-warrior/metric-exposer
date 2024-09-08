@@ -12,6 +12,7 @@ import cn.t.metric.common.message.metrics.batch.BatchDiscInfo;
 import cn.t.metric.common.message.metrics.batch.BatchDiscMetric;
 import cn.t.metric.common.message.metrics.batch.BatchNetworkInterfaceInfo;
 import cn.t.metric.common.message.metrics.batch.BatchNetworkMetric;
+import cn.t.metric.common.message.response.CmdResponse;
 import cn.t.metric.common.util.PopulateUtil;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class MessageHandlerAdapter {
         messageHandlerList.add(new BatchNetworkInterfaceInfoMessageHandler());
         messageHandlerList.add(new BatchDiscMetricMessageHandler());
         messageHandlerList.add(new BatchNetworkMetricMessageHandler());
+        messageHandlerList.add(new CmdResponseMessageHandler());
         messageHandlerList.add(new HeartBeatMessageHandler());
     }
 
@@ -269,6 +271,17 @@ public class MessageHandlerAdapter {
                 } else {
                     systemMetric.setNetworkMetricList(((BatchNetworkMetric)msg).getNetworkMetricList());
                 }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public static class CmdResponseMessageHandler implements MessageHandler  {
+        @Override
+        public boolean handle(ChannelContext channelContext, Object msg) throws Exception {
+            if(msg instanceof CmdResponse) {
+                System.out.printf("cmd 输出内容: %s%n", ((CmdResponse)msg).getOutput());
                 return true;
             }
             return false;

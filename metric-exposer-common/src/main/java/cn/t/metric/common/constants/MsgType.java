@@ -13,6 +13,9 @@ public enum MsgType {
     DISC_METRIC((byte)-4),
     NETWORK_METRIC((byte)-5),
 
+    CMD_REQUEST((byte)60),
+    CMD_RESPONSE((byte)61),
+
     BATCH((byte)-128)
     ;
     public final byte value;

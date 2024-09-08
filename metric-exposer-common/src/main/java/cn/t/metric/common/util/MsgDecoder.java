@@ -11,6 +11,8 @@ import cn.t.metric.common.message.metrics.batch.BatchDiscInfo;
 import cn.t.metric.common.message.metrics.batch.BatchDiscMetric;
 import cn.t.metric.common.message.metrics.batch.BatchNetworkInterfaceInfo;
 import cn.t.metric.common.message.metrics.batch.BatchNetworkMetric;
+import cn.t.metric.common.message.request.CmdRequest;
+import cn.t.metric.common.message.response.CmdResponse;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -51,10 +53,26 @@ public class MsgDecoder {
                 return decodeHeartBeat(buffer);
             } else if (MsgType.BATCH.value == type) {
                 return decodeBatch(buffer);
-            } else {
+            } else if (MsgType.CMD_REQUEST.value == type) {
+                return decodeCmdRequest(buffer);
+            }  else if (MsgType.CMD_RESPONSE.value == type) {
+                return decodeCmdResponse(buffer);
+            }  else {
                 throw new DecodeException("解析失败,未知消息类型: " +type);
             }
         }
+    }
+
+    private static CmdRequest decodeCmdRequest(ByteBuffer buffer) {
+        CmdRequest request = new CmdRequest();
+        request.setCmd(analyseString(buffer));
+        return request;
+    }
+
+    private static CmdResponse decodeCmdResponse(ByteBuffer buffer) {
+        CmdResponse response = new CmdResponse();
+        response.setOutput(analyseString(buffer));
+        return response;
     }
 
     private static Object decodeBatch(ByteBuffer buffer) {

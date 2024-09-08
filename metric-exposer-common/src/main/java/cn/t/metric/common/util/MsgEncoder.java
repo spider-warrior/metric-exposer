@@ -10,6 +10,8 @@ import cn.t.metric.common.message.metrics.batch.BatchDiscInfo;
 import cn.t.metric.common.message.metrics.batch.BatchDiscMetric;
 import cn.t.metric.common.message.metrics.batch.BatchNetworkInterfaceInfo;
 import cn.t.metric.common.message.metrics.batch.BatchNetworkMetric;
+import cn.t.metric.common.message.request.CmdRequest;
+import cn.t.metric.common.message.response.CmdResponse;
 
 import java.nio.ByteBuffer;
 import java.util.AbstractMap;
@@ -36,7 +38,9 @@ public class MsgEncoder {
             new AbstractMap.SimpleEntry<>(BatchDiscInfo.class, MsgType.BATCH.value),
             new AbstractMap.SimpleEntry<>(BatchNetworkInterfaceInfo.class, MsgType.BATCH.value),
             new AbstractMap.SimpleEntry<>(BatchDiscMetric.class, MsgType.BATCH.value),
-            new AbstractMap.SimpleEntry<>(BatchNetworkMetric.class, MsgType.BATCH.value)
+            new AbstractMap.SimpleEntry<>(BatchNetworkMetric.class, MsgType.BATCH.value),
+            new AbstractMap.SimpleEntry<>(CmdRequest.class, MsgType.CMD_REQUEST.value),
+            new AbstractMap.SimpleEntry<>(CmdResponse.class, MsgType.CMD_RESPONSE.value)
     ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
@@ -52,6 +56,8 @@ public class MsgEncoder {
             new AbstractMap.SimpleEntry<>(MsgType.MEMORY_METRIC.value, 256),
             new AbstractMap.SimpleEntry<>(MsgType.DISC_METRIC.value, 256),
             new AbstractMap.SimpleEntry<>(MsgType.NETWORK_METRIC.value, 256),
+            new AbstractMap.SimpleEntry<>(MsgType.CMD_REQUEST.value, 256),
+            new AbstractMap.SimpleEntry<>(MsgType.CMD_RESPONSE.value, 1024),
 
             new AbstractMap.SimpleEntry<>(MsgType.BATCH.value, 1024)
     ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -86,9 +92,33 @@ public class MsgEncoder {
             return encodeBatchDiscMetric((BatchDiscMetric)message);
         } else if(message instanceof BatchNetworkMetric) {
             return encodeBatchNetworkMetric((BatchNetworkMetric)message);
+        } else if(message instanceof CmdRequest) {
+            return encodeCmdRequest((CmdRequest)message);
+        } else if(message instanceof CmdResponse) {
+            return encodeCmdResponse((CmdResponse)message);
         } else {
             throw new RuntimeException("不支持编码的消息: " + message);
         }
+    }
+
+    public static ByteBuffer encodeCmdRequest(CmdRequest request) {
+        ByteBuffer buffer = allocate(request);
+        //cmd
+        writeString(buffer, request.getCmd());
+        //length
+        writeLength(buffer);
+        System.out.printf("encode %s, buffer size: %d%n", request.getClass().getSimpleName(), buffer.position());
+        return buffer;
+    }
+
+    public static ByteBuffer encodeCmdResponse(CmdResponse response) {
+        ByteBuffer buffer = allocate(response);
+        //output
+        buffer = writeString(buffer, response.getOutput());
+        //length
+        writeLength(buffer);
+        System.out.printf("encode %s, buffer size: %d%n", response.getClass().getSimpleName(), buffer.position());
+        return buffer;
     }
 
     public static ByteBuffer encodeBatchDiscInfo(BatchDiscInfo batchDiscInfo) {
@@ -336,10 +366,21 @@ public class MsgEncoder {
         buffer.putLong(discMetric.getFreeSize());
     }
 
-    private static void writeString(ByteBuffer buffer, String data) {
+    private static ByteBuffer writeString(ByteBuffer buffer, String data) {
         byte[] bytes = stringBytesCache.computeIfAbsent(data, key -> data.getBytes());
-        buffer.putInt(bytes.length);
-        buffer.put(bytes);
+        return ensureCapacity(buffer, bytes.length).putInt(bytes.length).put(bytes);
+    }
+
+    private static ByteBuffer ensureCapacity(ByteBuffer buffer, int size) {
+        if (buffer.remaining() < size) {
+            int newCapacity = buffer.capacity() * 2;
+            ByteBuffer newBuffer = ByteBuffer.allocate(newCapacity);
+            // 将旧缓冲区的数据复制到新缓冲区
+            buffer.flip(); // 切换到读模式
+            newBuffer.put(buffer);
+            return newBuffer;
+        }
+        return buffer;
     }
 
     private static ByteBuffer allocate(Object msg) {
