@@ -34,8 +34,7 @@ public class MetricExposerClient {
         try (Selector selector = Selector.open()) {
             MetricCollector metricCollector = new MetricCollector();
             while (loopRead) {
-                try {
-                    SocketChannel socketChannel = connect(serverHost, serverPort);
+                try(SocketChannel socketChannel = connect(serverHost, serverPort)) {
                     status = MetricExposerClientStatus.STARTED;
                     ChannelContext channelContext = new ChannelContext(socketChannel);
                     Map<String, Object> attrs = new HashMap<>();
@@ -101,7 +100,7 @@ public class MetricExposerClient {
         if(length > 0) {
             //convert to read mode
             readBuffer.flip();
-            while (true){
+            while (true) {
                 Object msg = MsgDecoder.decode(readBuffer);
                 if(msg == null) {
                     break;
