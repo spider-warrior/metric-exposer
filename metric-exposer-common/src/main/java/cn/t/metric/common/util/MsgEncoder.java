@@ -213,6 +213,10 @@ public class MsgEncoder {
         buffer.putLong(info.getFreeSwapSize());
         //processor数量
         buffer.putInt(info.getProcessorCount());
+        //cpu load
+        buffer.putDouble(info.getSystemCpuLoad());
+        //cpi load average
+        buffer.putDouble(info.getSystemCpuLoadAverage());
         //磁盘
         writeDiscInfoCollection(buffer, info.getDiscInfoList());
         //网卡

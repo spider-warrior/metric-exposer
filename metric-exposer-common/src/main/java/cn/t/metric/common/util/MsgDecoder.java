@@ -238,6 +238,10 @@ public class MsgDecoder {
         systemInfo.setFreeSwapSize(buffer.getLong());
         //processor数量
         systemInfo.setProcessorCount(buffer.getInt());
+        //cpu load
+        systemInfo.setSystemCpuLoad(buffer.getDouble());
+        //cpu load average
+        systemInfo.setSystemCpuLoadAverage(buffer.getDouble());
         //磁盘
         systemInfo.setDiscInfoList(decodeDiscInfoList(buffer));
         //网卡

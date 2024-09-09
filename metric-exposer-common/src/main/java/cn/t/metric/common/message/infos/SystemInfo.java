@@ -19,6 +19,10 @@ public class SystemInfo {
     private long freeSwapSize;
     //cpu数量
     private int processorCount;
+    //cpu负载
+    private double systemCpuLoad;
+    //cpu平均负载
+    private double systemCpuLoadAverage;
     //磁盘
     private List<DiscInfo> discInfoList;
     //网卡
@@ -88,6 +92,22 @@ public class SystemInfo {
         this.processorCount = processorCount;
     }
 
+    public double getSystemCpuLoad() {
+        return systemCpuLoad;
+    }
+
+    public void setSystemCpuLoad(double systemCpuLoad) {
+        this.systemCpuLoad = systemCpuLoad;
+    }
+
+    public double getSystemCpuLoadAverage() {
+        return systemCpuLoadAverage;
+    }
+
+    public void setSystemCpuLoadAverage(double systemCpuLoadAverage) {
+        this.systemCpuLoadAverage = systemCpuLoadAverage;
+    }
+
     public List<DiscInfo> getDiscInfoList() {
         return discInfoList;
     }
@@ -115,6 +135,8 @@ public class SystemInfo {
                 ", totalSwapSpaceSize=" + totalSwapSpaceSize +
                 ", freeSwapSize=" + freeSwapSize +
                 ", processorCount=" + processorCount +
+                ", systemCpuLoad=" + systemCpuLoad +
+                ", systemCpuLoadAverage=" + systemCpuLoadAverage +
                 ", discInfoList=" + discInfoList +
                 ", networkInterfaceInfoList=" + networkInterfaceInfoList +
                 '}';

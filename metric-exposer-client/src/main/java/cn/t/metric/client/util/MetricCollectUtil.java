@@ -103,6 +103,8 @@ public class MetricCollectUtil {
         systemInfo.setTotalSwapSpaceSize(systemMXBean.getTotalSwapSpaceSize());
         systemInfo.setFreeSwapSize(systemMXBean.getFreeSwapSpaceSize());
         systemInfo.setProcessorCount(Runtime.getRuntime().availableProcessors());
+        systemInfo.setSystemCpuLoad(systemMXBean.getSystemCpuLoad());
+        systemInfo.setSystemCpuLoadAverage(systemMXBean.getSystemLoadAverage());
         systemInfo.setDiscInfoList(collectDiscInfoList());
         systemInfo.setNetworkInterfaceInfoList(collectNetworkInterfaceInfoList());
         return systemInfo;
