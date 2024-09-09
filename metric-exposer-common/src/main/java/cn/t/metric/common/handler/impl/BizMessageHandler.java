@@ -105,31 +105,10 @@ public class BizMessageHandler {
                 systemInfo.setFreeSwapSize(systemMetric.getFreeSwapSize());
                 systemInfo.setSystemCpuLoad(systemMetric.getSystemCpuLoad());
                 systemMetric.setSystemCpuLoadAverage(systemMetric.getSystemCpuLoadAverage());
-                List<DiscMetric> discMetricList = systemMetric.getDiscMetricList();
-                List<DiscInfo> discInfoList = systemInfo.getDiscInfoList();
                 //磁盘可用空间
-                for (DiscMetric discMetric : discMetricList) {
-                    for (DiscInfo discInfo : discInfoList) {
-                        if(discMetric.getName().equals(discInfo.getName())) {
-                            discInfo.setFreeSize(discMetric.getFreeSize());
-                            break;
-                        }
-                    }
-                }
-                List<NetworkMetric> networkMetricList = systemMetric.getNetworkMetricList();
-                List<NetworkInterfaceInfo> networkInterfaceInfoList = systemInfo.getNetworkInterfaceInfoList();
+                PopulateUtil.populateDiscInfo(systemInfo.getDiscInfoList(), systemMetric.getDiscMetricList());
                 //网卡网速
-                for (NetworkMetric networkMetric : networkMetricList) {
-                    for (NetworkInterfaceInfo networkInterfaceInfo : networkInterfaceInfoList) {
-                        if(networkMetric.getInterfaceName().equals(networkInterfaceInfo.getInterfaceName())) {
-                            networkInterfaceInfo.setReceiveBytes(networkMetric.getReceiveBytes());
-                            networkInterfaceInfo.setSendBytes(networkMetric.getSendBytes());
-                            networkInterfaceInfo.setDownloadBytePerSecond(networkMetric.getDownloadBytePerSecond());
-                            networkInterfaceInfo.setUploadBytePerSecond(networkMetric.getUploadBytePerSecond());
-                            break;
-                        }
-                    }
-                }
+                PopulateUtil.populateNetworkInterfaceInfo(systemInfo.getNetworkInterfaceInfoList(), systemMetric.getNetworkMetricList());
             } else {
                 channelContext.invokeNextHandlerRead(msg);
             }
@@ -140,16 +119,9 @@ public class BizMessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof CpuLoadMetric) {
-                SystemMetric systemMetric = ipSystemMetricMap.get(channelContext.getRemoteIp());
-                if(systemMetric == null) {
-                    systemMetric = new SystemMetric();
-                    systemMetric.setSystemCpuLoad(((CpuLoadMetric)msg).getSystemCpuLoad());
-                    systemMetric.setSystemCpuLoadAverage(((CpuLoadMetric)msg).getSystemCpuLoadAverage());
-                    ipSystemMetricMap.put(channelContext.getRemoteIp(), systemMetric);
-                } else {
-                    systemMetric.setSystemCpuLoad(((CpuLoadMetric)msg).getSystemCpuLoad());
-                    systemMetric.setSystemCpuLoadAverage(((CpuLoadMetric)msg).getSystemCpuLoadAverage());
-                }
+                SystemInfo systemInfo = ipSystemInfoMap.get(channelContext.getRemoteIp());
+                systemInfo.setSystemCpuLoad(((CpuLoadMetric)msg).getSystemCpuLoad());
+                systemInfo.setSystemCpuLoadAverage(((CpuLoadMetric)msg).getSystemCpuLoadAverage());
             } else {
                 channelContext.invokeNextHandlerRead(msg);
             }
@@ -160,15 +132,14 @@ public class BizMessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof DiscMetric) {
-                SystemMetric systemMetric = ipSystemMetricMap.get(channelContext.getRemoteIp());
-                if(systemMetric == null) {
-                    systemMetric = new SystemMetric();
-                    List<DiscMetric> discMetricList = new ArrayList<>();
-                    discMetricList.add((DiscMetric)msg);
-                    systemMetric.setDiscMetricList(discMetricList);
-                    ipSystemMetricMap.put(channelContext.getRemoteIp(), systemMetric);
-                } else {
-                    PopulateUtil.populateDiscMetric(systemMetric, (DiscMetric)msg);
+                DiscMetric discMetric = (DiscMetric)msg;
+                SystemInfo systemInfo = ipSystemInfoMap.get(channelContext.getRemoteIp());
+                List<DiscInfo> discInfoList = systemInfo.getDiscInfoList();
+                for (DiscInfo discInfo : discInfoList) {
+                    if(discInfo.getName().equals(discMetric.getName())) {
+                        discInfo.setFreeSize(discMetric.getFreeSize());
+                        break;
+                    }
                 }
             } else {
                 channelContext.invokeNextHandlerRead(msg);
@@ -180,16 +151,9 @@ public class BizMessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof MemoryMetric) {
-                SystemMetric systemMetric = ipSystemMetricMap.get(channelContext.getRemoteIp());
-                if(systemMetric == null) {
-                    systemMetric = new SystemMetric();
-                    systemMetric.setFreePhysicalMemorySize(((MemoryMetric)msg).getPhysicalMemoryFree());
-                    systemMetric.setFreeSwapSize(((MemoryMetric)msg).getSwapMemoryFree());
-                    ipSystemMetricMap.put(channelContext.getRemoteIp(), systemMetric);
-                } else {
-                    systemMetric.setFreePhysicalMemorySize(((MemoryMetric)msg).getPhysicalMemoryFree());
-                    systemMetric.setFreeSwapSize(((MemoryMetric)msg).getSwapMemoryFree());
-                }
+                SystemInfo systemInfo = ipSystemInfoMap.get(channelContext.getRemoteIp());
+                systemInfo.setFreePhysicalMemorySize(((MemoryMetric)msg).getPhysicalMemoryFree());
+                systemInfo.setFreeSwapSize(((MemoryMetric)msg).getSwapMemoryFree());
             } else {
                 channelContext.invokeNextHandlerRead(msg);
             }
@@ -200,15 +164,16 @@ public class BizMessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof NetworkMetric) {
-                SystemMetric systemMetric = ipSystemMetricMap.get(channelContext.getRemoteIp());
-                if(systemMetric == null) {
-                    systemMetric = new SystemMetric();
-                    List<NetworkMetric> networkMetricList = new ArrayList<>();
-                    networkMetricList.add((NetworkMetric)msg);
-                    systemMetric.setNetworkMetricList(networkMetricList);
-                    ipSystemMetricMap.put(channelContext.getRemoteIp(), systemMetric);
-                } else {
-                    PopulateUtil.populateNetworkMetric(systemMetric, (NetworkMetric)msg);
+                NetworkMetric networkMetric = (NetworkMetric)msg;
+                SystemInfo systemInfo = ipSystemInfoMap.get(channelContext.getRemoteIp());
+                List<NetworkInterfaceInfo> networkInterfaceInfoList = systemInfo.getNetworkInterfaceInfoList();
+                for (NetworkInterfaceInfo networkInterfaceInfo : networkInterfaceInfoList) {
+                    if(networkInterfaceInfo.getInterfaceName().equals(networkMetric.getInterfaceName())) {
+                        networkInterfaceInfo.setReceiveBytes(networkMetric.getReceiveBytes());
+                        networkInterfaceInfo.setSendBytes(networkMetric.getSendBytes());
+                        networkInterfaceInfo.setDownloadBytePerSecond(networkMetric.getDownloadBytePerSecond());
+                        networkInterfaceInfo.setUploadBytePerSecond(networkMetric.getUploadBytePerSecond());
+                    }
                 }
             } else {
                 channelContext.invokeNextHandlerRead(msg);
@@ -256,17 +221,9 @@ public class BizMessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof BatchDiscMetric) {
-                SystemMetric systemMetric = ipSystemMetricMap.get(channelContext.getRemoteIp());
-                if(systemMetric == null) {
-                    systemMetric = new SystemMetric();
-                    systemMetric.setDiscMetricList(((BatchDiscMetric)msg).getDiscMetricList());
-                    ipSystemMetricMap.put(channelContext.getRemoteIp(), systemMetric);
-                } else {
-                    systemMetric.setDiscMetricList(((BatchDiscMetric)msg).getDiscMetricList());
-                }
+                PopulateUtil.populateDiscInfo(ipSystemInfoMap.get(channelContext.getRemoteIp()).getDiscInfoList(), ((BatchDiscMetric)msg).getDiscMetricList());
                 System.out.println("-----------------------------------------------------------------------------------------------");
                 System.out.println("ipSystemInfoMap:\n" + ipSystemInfoMap);
-                System.out.println("ipSystemMetricMap:\n" + ipSystemMetricMap);
                 System.out.println("-----------------------------------------------------------------------------------------------");
             } else {
                 channelContext.invokeNextHandlerRead(msg);
@@ -278,14 +235,7 @@ public class BizMessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof BatchNetworkMetric) {
-                SystemMetric systemMetric = ipSystemMetricMap.get(channelContext.getRemoteIp());
-                if(systemMetric == null) {
-                    systemMetric = new SystemMetric();
-                    systemMetric.setNetworkMetricList(((BatchNetworkMetric)msg).getNetworkMetricList());
-                    ipSystemMetricMap.put(channelContext.getRemoteIp(), systemMetric);
-                } else {
-                    systemMetric.setNetworkMetricList(((BatchNetworkMetric)msg).getNetworkMetricList());
-                }
+                PopulateUtil.populateNetworkInterfaceInfo(ipSystemInfoMap.get(channelContext.getRemoteIp()).getNetworkInterfaceInfoList(), ((BatchNetworkMetric)msg).getNetworkMetricList());
             } else {
                 channelContext.invokeNextHandlerRead(msg);
             }

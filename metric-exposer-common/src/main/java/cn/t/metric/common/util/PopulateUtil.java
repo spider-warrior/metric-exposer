@@ -5,7 +5,6 @@ import cn.t.metric.common.message.infos.NetworkInterfaceInfo;
 import cn.t.metric.common.message.infos.SystemInfo;
 import cn.t.metric.common.message.metrics.DiscMetric;
 import cn.t.metric.common.message.metrics.NetworkMetric;
-import cn.t.metric.common.message.metrics.SystemMetric;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,44 +52,27 @@ public class PopulateUtil {
         }
     }
 
-    public static void populateDiscMetric(SystemMetric systemMetric, DiscMetric metric) {
-        List<DiscMetric> discMetricList = systemMetric.getDiscMetricList();
-        if(discMetricList == null) {
-            discMetricList = new ArrayList<>();
-            discMetricList.add(metric);
-            systemMetric.setDiscMetricList(discMetricList);
-        } else {
-            boolean replaced = false;
-            for (int i = 0; i < discMetricList.size(); i++) {
-                if(discMetricList.get(i).getName().equals(metric.getName())) {
-                    discMetricList.set(i, metric);
-                    replaced = true;
+    public static void populateNetworkInterfaceInfo(List<NetworkInterfaceInfo> networkInterfaceInfoList, List<NetworkMetric> networkMetricList) {
+        for (NetworkMetric networkMetric : networkMetricList) {
+            for (NetworkInterfaceInfo networkInterfaceInfo : networkInterfaceInfoList) {
+                if (networkMetric.getInterfaceName().equals(networkInterfaceInfo.getInterfaceName())) {
+                    networkInterfaceInfo.setReceiveBytes(networkMetric.getReceiveBytes());
+                    networkInterfaceInfo.setSendBytes(networkMetric.getSendBytes());
+                    networkInterfaceInfo.setDownloadBytePerSecond(networkMetric.getDownloadBytePerSecond());
+                    networkInterfaceInfo.setUploadBytePerSecond(networkMetric.getUploadBytePerSecond());
                     break;
                 }
-            }
-            if(!replaced) {
-                discMetricList.add(metric);
             }
         }
     }
 
-    public static void populateNetworkMetric(SystemMetric systemMetric, NetworkMetric metric) {
-        List<NetworkMetric> networkMetricList = systemMetric.getNetworkMetricList();
-        if(networkMetricList == null) {
-            networkMetricList = new ArrayList<>();
-            networkMetricList.add(metric);
-            systemMetric.setNetworkMetricList(networkMetricList);
-        } else {
-            boolean replaced = false;
-            for (int i = 0; i < networkMetricList.size(); i++) {
-                if(networkMetricList.get(i).getInterfaceName().equals(metric.getInterfaceName())) {
-                    networkMetricList.set(i, metric);
-                    replaced = true;
+    public static void populateDiscInfo(List<DiscInfo> discInfoList, List<DiscMetric> discMetricList) {
+        for (DiscMetric discMetric : discMetricList) {
+            for (DiscInfo discInfo : discInfoList) {
+                if(discMetric.getName().equals(discInfo.getName())) {
+                    discInfo.setFreeSize(discMetric.getFreeSize());
                     break;
                 }
-            }
-            if(!replaced) {
-                networkMetricList.add(metric);
             }
         }
     }
