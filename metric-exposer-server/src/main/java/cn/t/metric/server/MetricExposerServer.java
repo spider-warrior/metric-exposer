@@ -15,10 +15,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,9 +26,10 @@ public class MetricExposerServer {
     private final int bindPrt;
     private final String bingAddress;
     private final ChannelContextManager manager;
+    private final long examinePeriod = TimeUnit.SECONDS.toMillis(3);
+    private Selector openedSelector;
     private MetricExposerServerStatus status;
     private boolean loopRead = true;
-    private final long examinePeriod = TimeUnit.SECONDS.toMillis(3);
     private long nextExamineTime = 0;
 
 
@@ -40,6 +38,7 @@ public class MetricExposerServer {
                 Selector selector = Selector.open();
                 ServerSocketChannel serverSocketChannel = ServerSocketChannel.open()
         ) {
+            openedSelector = selector;
             // 构建监听服务
             serverSocketChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
             serverSocketChannel.configureBlocking(false);
@@ -64,6 +63,7 @@ public class MetricExposerServer {
             throw new MetricExposerServerException(e);
         } finally {
             status = MetricExposerServerStatus.STOPPED;
+            manager.closeAllChannelContext();
         }
     }
 
@@ -147,6 +147,7 @@ public class MetricExposerServer {
     public void stop() {
         if(this.loopRead) {
             this.loopRead = false;
+            this.openedSelector.wakeup();
         }
     }
 

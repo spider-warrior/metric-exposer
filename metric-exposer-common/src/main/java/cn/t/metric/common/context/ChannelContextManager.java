@@ -1,11 +1,11 @@
 package cn.t.metric.common.context;
 
+import cn.t.metric.common.util.ChannelUtil;
+
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -14,7 +14,6 @@ public class ChannelContextManager {
     private static final long ttlMills = TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS);
     private final List<String> tempList = new ArrayList<>(20);
 
-    private final List<String> serverIpList = new Vector<>();
     private final PriorityBlockingQueue<ChannelContext> channelContextPriorityQueue = new PriorityBlockingQueue<>(10, (o1, o2) -> (int)(o1.getLastRwTime() - o2.getLastRwTime()));
 
     public void add(ChannelContext channelContext) {
@@ -22,7 +21,6 @@ public class ChannelContextManager {
         if(!success) {
             throw new RuntimeException("channelContextManager#add(channelContext) failed, channelContext: " + channelContext);
         }
-        serverIpList.add(channelContext.getRemoteIp());
     }
 
     public void modify(ChannelContext channelContext) {
@@ -34,14 +32,6 @@ public class ChannelContextManager {
         if(!success) {
             throw new RuntimeException("channelContextPriorityQueue#offer(channelContext) failed, channelContext: " + channelContext);
         }
-    }
-
-    public boolean isServerOnLine(String ip) {
-        return serverIpList.contains(ip);
-    }
-
-    public List<String> onlineInstanceIpList() {
-        return Collections.unmodifiableList(serverIpList);
     }
 
     public void examineExpiredChannelContext() {
@@ -87,8 +77,14 @@ public class ChannelContextManager {
         }
     }
 
+    public void closeAllChannelContext() {
+        while(!channelContextPriorityQueue.isEmpty()) {
+            ChannelContext channelContext = channelContextPriorityQueue.poll();
+            channelContext.close();
+        }
+    }
+
     public boolean clearChannelContext(ChannelContext channelContext) {
-        serverIpList.remove(channelContext.getRemoteIp());
         return channelContextPriorityQueue.remove(channelContext);
     }
 }
