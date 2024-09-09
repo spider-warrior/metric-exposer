@@ -63,7 +63,7 @@ public class MetricExposerServer {
         } catch (Exception e) {
             throw new MetricExposerServerException(e);
         } finally {
-            releaseResource();
+            status = MetricExposerServerStatus.STOPPED;
         }
     }
 
@@ -147,13 +147,7 @@ public class MetricExposerServer {
     public void stop() {
         if(this.loopRead) {
             this.loopRead = false;
-            releaseResource();
         }
-    }
-
-    public void releaseResource() {
-        status = MetricExposerServerStatus.STOPPED;
-        System.out.println("ServerMessageReader中止!");
     }
 
     public MetricExposerServerStatus status() {
