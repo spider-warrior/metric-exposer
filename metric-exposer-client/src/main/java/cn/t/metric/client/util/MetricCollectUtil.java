@@ -136,7 +136,10 @@ public class MetricCollectUtil {
             DiscInfo discInfo = new DiscInfo();
             discInfo.setName(store.name());
             discInfo.setType(store.type());
-            try { discInfo.setTotalSize(store.getTotalSpace());} catch (IOException e) {
+            try {
+                discInfo.setTotalSize(store.getTotalSpace());
+                discInfo.setFreeSize(store.getUsableSpace());
+            } catch (IOException e) {
                 System.err.println("磁盘[总大小]采集失败, storeName: " + store.name());
                 discInfo.setTotalSize(-1);
             }

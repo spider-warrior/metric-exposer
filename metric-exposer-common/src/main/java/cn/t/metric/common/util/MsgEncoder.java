@@ -312,6 +312,8 @@ public class MsgEncoder {
         writeString(buffer, discInfo.getType());
         //total size
         buffer.putLong(discInfo.getTotalSize());
+        //free size
+        buffer.putLong(discInfo.getFreeSize());
     }
 
     private static void writeNetworkInterfaceInfoCollection(ByteBuffer buffer, Collection<NetworkInterfaceInfo> networkInterfaceInfoCollection) {

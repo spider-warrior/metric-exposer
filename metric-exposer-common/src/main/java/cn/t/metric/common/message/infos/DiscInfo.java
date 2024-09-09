@@ -4,6 +4,8 @@ public class DiscInfo {
     private String name;
     private String type;
     private long totalSize;
+    private long freeSize;
+
 
     public String getName() {
         return name;
@@ -29,12 +31,21 @@ public class DiscInfo {
         this.totalSize = totalSize;
     }
 
+    public long getFreeSize() {
+        return freeSize;
+    }
+
+    public void setFreeSize(long freeSize) {
+        this.freeSize = freeSize;
+    }
+
     @Override
     public String toString() {
         return "DiscInfo{" +
                 "name='" + name + '\'' +
                 ", type='" + type + '\'' +
                 ", totalSize=" + totalSize +
+                ", freeSize=" + freeSize +
                 '}';
     }
 }

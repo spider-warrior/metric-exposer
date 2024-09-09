@@ -137,6 +137,8 @@ public class MsgDecoder {
         discInfo.setType(analyseString(buffer));
         //total size
         discInfo.setTotalSize(buffer.getLong());
+        //free size
+        discInfo.setFreeSize(buffer.getLong());
         return discInfo;
     }
 
