@@ -43,20 +43,16 @@ public class MessageHandlerAdapter {
     }
 
     public void handle(ChannelContext channelContext, Object msg) {
-        boolean handled = false;
         for (MessageHandler messageHandler : messageHandlerList) {
             try {
                 if(messageHandler.handle(channelContext, msg)) {
-                    handled = true;
-                    break;
+                    return;
                 }
             } catch (Exception e) {
                 throw new MessageHandlerExecuteException(e);
             }
         }
-        if(!handled) {
-            throw new MessageHandlerExecuteException("未知消息: " + msg);
-        }
+        throw new MessageHandlerExecuteException("未知消息: " + msg);
     }
 
     public class SystemInfoMessageHandler implements MessageHandler {
