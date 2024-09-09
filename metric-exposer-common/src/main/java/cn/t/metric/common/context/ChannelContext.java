@@ -9,7 +9,10 @@ import cn.t.metric.common.util.MsgEncoder;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 public class ChannelContext {
 
@@ -19,6 +22,7 @@ public class ChannelContext {
     private long lastReadTime;
     private long lastWriteTime;
     private long lastRwTime;
+    private final List<MessageHandler> messageHandlerList = new ArrayList<>();
     private Iterator<MessageHandler> it;
 
     public SocketChannel getSocketChannel() {
@@ -85,8 +89,16 @@ public class ChannelContext {
         }
     }
 
-    public void invokeHandlerRead(Iterator<MessageHandler> it, Object msg) {
-        this.it = it;
+    public void addMessageHandler(MessageHandler messageHandler) {
+        this.messageHandlerList.add(messageHandler);
+    }
+
+    public void addMessageHandler(Collection<MessageHandler> messageHandlerCollection) {
+        this.messageHandlerList.addAll(messageHandlerCollection);
+    }
+
+    public void invokeHandlerRead(Object msg) {
+        this.it = messageHandlerList.iterator();
         this.invokeNextHandlerRead(msg);
     }
 

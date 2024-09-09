@@ -3,6 +3,9 @@ package cn.t.metric.server;
 import cn.t.metric.common.constants.ChannelAttrName;
 import cn.t.metric.common.context.ChannelContext;
 import cn.t.metric.common.context.ChannelContextManager;
+import cn.t.metric.common.handler.impl.BizMessageHandler;
+import cn.t.metric.common.handler.impl.HeadMessageHandler;
+import cn.t.metric.common.handler.impl.TailMessageHandler;
 import cn.t.metric.common.message.infos.SystemInfo;
 import cn.t.metric.common.message.metrics.SystemMetric;
 import cn.t.metric.common.util.ChannelUtil;
@@ -35,7 +38,6 @@ public class MetricExposerServer {
     private final Map<String, SystemMetric> ipSystemMetricMap = new ConcurrentHashMap<>();
     private final long examinePeriod = TimeUnit.SECONDS.toMillis(3);
     private long nextExamineTime = 0;
-    private final MessageHandlerAdapter messageHandlerAdapter = new MessageHandlerAdapter();
 
 
     public void start() {
@@ -109,6 +111,10 @@ public class MetricExposerServer {
         Map<String, Object> attrs = new HashMap<>();
         attrs.put(ChannelAttrName.attrChannelContext, channelContext);
         socketChannel.register(key.selector(), SelectionKey.OP_READ, attrs);
+        //添加消息处理器
+        channelContext.addMessageHandler(new HeadMessageHandler());
+        channelContext.addMessageHandler(BizMessageHandler.bizMessageHandlerList());
+        channelContext.addMessageHandler(new TailMessageHandler());
         manager.add(channelContext);
         System.out.printf("新建连接, 远程地址: %s, time: %d%n", socketChannel.getRemoteAddress(), System.currentTimeMillis());
     }
@@ -131,7 +137,7 @@ public class MetricExposerServer {
                 if(message == null) {
                     break;
                 } else {
-                    messageHandlerAdapter.handle(channelContext, message);
+                    channelContext.invokeHandlerRead(message);
                 }
             }
             //convert to write mode

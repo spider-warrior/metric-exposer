@@ -1,9 +1,7 @@
-package cn.t.metric.server;
+package cn.t.metric.common.handler.impl;
 
 import cn.t.metric.common.context.ChannelContext;
-import cn.t.metric.common.handler.HeadHandler;
 import cn.t.metric.common.handler.MessageHandler;
-import cn.t.metric.common.handler.TailHandler;
 import cn.t.metric.common.message.HeartBeat;
 import cn.t.metric.common.message.infos.DiscInfo;
 import cn.t.metric.common.message.infos.NetworkInterfaceInfo;
@@ -17,39 +15,36 @@ import cn.t.metric.common.message.response.CmdResponse;
 import cn.t.metric.common.util.PopulateUtil;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MessageHandlerAdapter {
+public class BizMessageHandler {
     private final Map<String, SystemInfo> ipSystemInfoMap = new ConcurrentHashMap<>();
     private final Map<String, SystemMetric> ipSystemMetricMap = new ConcurrentHashMap<>();
-    private final List<MessageHandler> messageHandlerList = new ArrayList<>();
 
-    {
-        messageHandlerList.add(new HeadHandler());
-        messageHandlerList.add(new SystemInfoMessageHandler());
-        messageHandlerList.add(new DiscInfoMessageHandler());
-        messageHandlerList.add(new NetworkInterfaceInfoMessageHandler());
-        messageHandlerList.add(new SystemMetricMessageHandler());
-        messageHandlerList.add(new CpuLoadMetricMessageHandler());
-        messageHandlerList.add(new DiscMetricMessageHandler());
-        messageHandlerList.add(new MemoryMetricMessageHandler());
-        messageHandlerList.add(new NetworkMetricMessageHandler());
-        messageHandlerList.add(new BatchDiscInfoMessageHandler());
-        messageHandlerList.add(new BatchNetworkInterfaceInfoMessageHandler());
-        messageHandlerList.add(new BatchDiscMetricMessageHandler());
-        messageHandlerList.add(new BatchNetworkMetricMessageHandler());
-        messageHandlerList.add(new CmdResponseMessageHandler());
-        messageHandlerList.add(new HeartBeatMessageHandler());
-        messageHandlerList.add(new TailHandler());
+    public static Collection<MessageHandler> bizMessageHandlerList() {
+        List<MessageHandler> messageHandlerList = new ArrayList<>();
+        BizMessageHandler bizMessageHandler = new BizMessageHandler();
+        messageHandlerList.add(bizMessageHandler.new SystemInfoMessageHandler());
+        messageHandlerList.add(bizMessageHandler.new DiscInfoMessageHandler());
+        messageHandlerList.add(bizMessageHandler.new NetworkInterfaceInfoMessageHandler());
+        messageHandlerList.add(bizMessageHandler.new SystemMetricMessageHandler());
+        messageHandlerList.add(bizMessageHandler.new CpuLoadMetricMessageHandler());
+        messageHandlerList.add(bizMessageHandler.new DiscMetricMessageHandler());
+        messageHandlerList.add(bizMessageHandler.new MemoryMetricMessageHandler());
+        messageHandlerList.add(bizMessageHandler.new NetworkMetricMessageHandler());
+        messageHandlerList.add(bizMessageHandler.new BatchDiscInfoMessageHandler());
+        messageHandlerList.add(bizMessageHandler.new BatchNetworkInterfaceInfoMessageHandler());
+        messageHandlerList.add(bizMessageHandler.new BatchDiscMetricMessageHandler());
+        messageHandlerList.add(bizMessageHandler.new BatchNetworkMetricMessageHandler());
+        messageHandlerList.add(bizMessageHandler.new CmdResponseMessageHandler());
+        messageHandlerList.add(bizMessageHandler.new HeartBeatMessageHandler());
+        return messageHandlerList;
     }
 
-    public void handle(ChannelContext channelContext, Object msg) {
-        channelContext.invokeHandlerRead(messageHandlerList.iterator(), msg);
-    }
-
-    public class SystemInfoMessageHandler implements MessageHandler {
+    private class SystemInfoMessageHandler implements MessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof SystemInfo) {
@@ -60,7 +55,7 @@ public class MessageHandlerAdapter {
         }
     }
 
-    public class DiscInfoMessageHandler implements MessageHandler {
+    private class DiscInfoMessageHandler implements MessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof DiscInfo) {
@@ -80,7 +75,7 @@ public class MessageHandlerAdapter {
         }
     }
 
-    public class NetworkInterfaceInfoMessageHandler implements MessageHandler {
+    private class NetworkInterfaceInfoMessageHandler implements MessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof NetworkInterfaceInfo) {
@@ -100,7 +95,7 @@ public class MessageHandlerAdapter {
         }
     }
 
-    public class SystemMetricMessageHandler implements MessageHandler {
+    private class SystemMetricMessageHandler implements MessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof SystemMetric) {
@@ -111,7 +106,7 @@ public class MessageHandlerAdapter {
         }
     }
 
-    public class CpuLoadMetricMessageHandler implements MessageHandler {
+    private class CpuLoadMetricMessageHandler implements MessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof CpuLoadMetric) {
@@ -131,7 +126,7 @@ public class MessageHandlerAdapter {
         }
     }
 
-    public class DiscMetricMessageHandler implements MessageHandler {
+    private class DiscMetricMessageHandler implements MessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof DiscMetric) {
@@ -151,7 +146,7 @@ public class MessageHandlerAdapter {
         }
     }
 
-    public class MemoryMetricMessageHandler implements MessageHandler {
+    private class MemoryMetricMessageHandler implements MessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof MemoryMetric) {
@@ -171,7 +166,7 @@ public class MessageHandlerAdapter {
         }
     }
 
-    public class NetworkMetricMessageHandler implements MessageHandler {
+    private class NetworkMetricMessageHandler implements MessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof NetworkMetric) {
@@ -191,7 +186,7 @@ public class MessageHandlerAdapter {
         }
     }
 
-    public class BatchDiscInfoMessageHandler implements MessageHandler {
+    private class BatchDiscInfoMessageHandler implements MessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof BatchDiscInfo) {
@@ -209,7 +204,7 @@ public class MessageHandlerAdapter {
         }
     }
 
-    public class BatchNetworkInterfaceInfoMessageHandler implements MessageHandler {
+    private class BatchNetworkInterfaceInfoMessageHandler implements MessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof BatchNetworkInterfaceInfo) {
@@ -227,7 +222,7 @@ public class MessageHandlerAdapter {
         }
     }
 
-    public class BatchDiscMetricMessageHandler implements MessageHandler {
+    private class BatchDiscMetricMessageHandler implements MessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof BatchDiscMetric) {
@@ -249,7 +244,7 @@ public class MessageHandlerAdapter {
         }
     }
 
-    public class BatchNetworkMetricMessageHandler implements MessageHandler {
+    private class BatchNetworkMetricMessageHandler implements MessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof BatchNetworkMetric) {
@@ -267,7 +262,7 @@ public class MessageHandlerAdapter {
         }
     }
 
-    public static class CmdResponseMessageHandler implements MessageHandler  {
+    private class CmdResponseMessageHandler implements MessageHandler  {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof CmdResponse) {
@@ -278,7 +273,7 @@ public class MessageHandlerAdapter {
         }
     }
 
-    public static class HeartBeatMessageHandler implements MessageHandler {
+    private class HeartBeatMessageHandler implements MessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) throws Exception {
             if(msg instanceof HeartBeat) {
