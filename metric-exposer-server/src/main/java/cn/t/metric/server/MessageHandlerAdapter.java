@@ -1,8 +1,9 @@
 package cn.t.metric.server;
 
 import cn.t.metric.common.context.ChannelContext;
-import cn.t.metric.common.exception.MessageHandlerExecuteException;
+import cn.t.metric.common.handler.HeadHandler;
 import cn.t.metric.common.handler.MessageHandler;
+import cn.t.metric.common.handler.TailHandler;
 import cn.t.metric.common.message.HeartBeat;
 import cn.t.metric.common.message.infos.DiscInfo;
 import cn.t.metric.common.message.infos.NetworkInterfaceInfo;
@@ -26,6 +27,7 @@ public class MessageHandlerAdapter {
     private final List<MessageHandler> messageHandlerList = new ArrayList<>();
 
     {
+        messageHandlerList.add(new HeadHandler());
         messageHandlerList.add(new SystemInfoMessageHandler());
         messageHandlerList.add(new DiscInfoMessageHandler());
         messageHandlerList.add(new NetworkInterfaceInfoMessageHandler());
@@ -40,35 +42,27 @@ public class MessageHandlerAdapter {
         messageHandlerList.add(new BatchNetworkMetricMessageHandler());
         messageHandlerList.add(new CmdResponseMessageHandler());
         messageHandlerList.add(new HeartBeatMessageHandler());
+        messageHandlerList.add(new TailHandler());
     }
 
     public void handle(ChannelContext channelContext, Object msg) {
-        for (MessageHandler messageHandler : messageHandlerList) {
-            try {
-                if(messageHandler.handle(channelContext, msg)) {
-                    return;
-                }
-            } catch (Exception e) {
-                throw new MessageHandlerExecuteException(e);
-            }
-        }
-        throw new MessageHandlerExecuteException("未知消息: " + msg);
+        channelContext.invokeHandlerRead(messageHandlerList.iterator(), msg);
     }
 
     public class SystemInfoMessageHandler implements MessageHandler {
         @Override
-        public boolean handle(ChannelContext channelContext, Object msg) {
+        public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof SystemInfo) {
                 ipSystemInfoMap.put(channelContext.getRemoteIp(), (SystemInfo)msg);
-                return true;
+            } else {
+                channelContext.invokeNextHandlerRead(msg);
             }
-            return false;
         }
     }
 
     public class DiscInfoMessageHandler implements MessageHandler {
         @Override
-        public boolean handle(ChannelContext channelContext, Object msg) {
+        public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof DiscInfo) {
                 SystemInfo systemInfo = ipSystemInfoMap.get(channelContext.getRemoteIp());
                 if(systemInfo == null) {
@@ -80,15 +74,15 @@ public class MessageHandlerAdapter {
                 } else {
                     PopulateUtil.populateDiscInfo(systemInfo, (DiscInfo)msg);
                 }
-                return true;
+            } else {
+                channelContext.invokeNextHandlerRead(msg);
             }
-            return false;
         }
     }
 
     public class NetworkInterfaceInfoMessageHandler implements MessageHandler {
         @Override
-        public boolean handle(ChannelContext channelContext, Object msg) {
+        public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof NetworkInterfaceInfo) {
                 SystemInfo systemInfo = ipSystemInfoMap.get(channelContext.getRemoteIp());
                 if(systemInfo == null) {
@@ -100,26 +94,26 @@ public class MessageHandlerAdapter {
                 } else {
                     PopulateUtil.populateNetworkInterfaceInfo(systemInfo, (NetworkInterfaceInfo)msg);
                 }
-                return true;
+            } else {
+                channelContext.invokeNextHandlerRead(msg);
             }
-            return false;
         }
     }
 
     public class SystemMetricMessageHandler implements MessageHandler {
         @Override
-        public boolean handle(ChannelContext channelContext, Object msg) {
+        public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof SystemMetric) {
                 ipSystemMetricMap.put(channelContext.getRemoteIp(), (SystemMetric)msg);
-                return true;
+            } else {
+                channelContext.invokeNextHandlerRead(msg);
             }
-            return false;
         }
     }
 
     public class CpuLoadMetricMessageHandler implements MessageHandler {
         @Override
-        public boolean handle(ChannelContext channelContext, Object msg) {
+        public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof CpuLoadMetric) {
                 SystemMetric systemMetric = ipSystemMetricMap.get(channelContext.getRemoteIp());
                 if(systemMetric == null) {
@@ -131,15 +125,15 @@ public class MessageHandlerAdapter {
                     systemMetric.setSystemCpuLoad(((CpuLoadMetric)msg).getSystemCpuLoad());
                     systemMetric.setSystemCpuLoadAverage(((CpuLoadMetric)msg).getSystemCpuLoadAverage());
                 }
-                return true;
+            } else {
+                channelContext.invokeNextHandlerRead(msg);
             }
-            return false;
         }
     }
 
     public class DiscMetricMessageHandler implements MessageHandler {
         @Override
-        public boolean handle(ChannelContext channelContext, Object msg) {
+        public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof DiscMetric) {
                 SystemMetric systemMetric = ipSystemMetricMap.get(channelContext.getRemoteIp());
                 if(systemMetric == null) {
@@ -151,15 +145,15 @@ public class MessageHandlerAdapter {
                 } else {
                     PopulateUtil.populateDiscMetric(systemMetric, (DiscMetric)msg);
                 }
-                return true;
+            } else {
+                channelContext.invokeNextHandlerRead(msg);
             }
-            return false;
         }
     }
 
     public class MemoryMetricMessageHandler implements MessageHandler {
         @Override
-        public boolean handle(ChannelContext channelContext, Object msg) {
+        public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof MemoryMetric) {
                 SystemMetric systemMetric = ipSystemMetricMap.get(channelContext.getRemoteIp());
                 if(systemMetric == null) {
@@ -171,15 +165,15 @@ public class MessageHandlerAdapter {
                     systemMetric.setFreePhysicalMemorySize(((MemoryMetric)msg).getPhysicalMemoryFree());
                     systemMetric.setFreeSwapSize(((MemoryMetric)msg).getSwapMemoryFree());
                 }
-                return true;
+            } else {
+                channelContext.invokeNextHandlerRead(msg);
             }
-            return false;
         }
     }
 
     public class NetworkMetricMessageHandler implements MessageHandler {
         @Override
-        public boolean handle(ChannelContext channelContext, Object msg) {
+        public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof NetworkMetric) {
                 SystemMetric systemMetric = ipSystemMetricMap.get(channelContext.getRemoteIp());
                 if(systemMetric == null) {
@@ -191,15 +185,15 @@ public class MessageHandlerAdapter {
                 } else {
                     PopulateUtil.populateNetworkMetric(systemMetric, (NetworkMetric)msg);
                 }
-                return true;
+            } else {
+                channelContext.invokeNextHandlerRead(msg);
             }
-            return false;
         }
     }
 
     public class BatchDiscInfoMessageHandler implements MessageHandler {
         @Override
-        public boolean handle(ChannelContext channelContext, Object msg) {
+        public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof BatchDiscInfo) {
                 SystemInfo systemInfo = ipSystemInfoMap.get(channelContext.getRemoteIp());
                 if(systemInfo == null) {
@@ -209,15 +203,15 @@ public class MessageHandlerAdapter {
                 } else {
                     systemInfo.setDiscInfoList(((BatchDiscInfo)msg).getDiscInfoList());
                 }
-                return true;
+            } else {
+                channelContext.invokeNextHandlerRead(msg);
             }
-            return false;
         }
     }
 
     public class BatchNetworkInterfaceInfoMessageHandler implements MessageHandler {
         @Override
-        public boolean handle(ChannelContext channelContext, Object msg) {
+        public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof BatchNetworkInterfaceInfo) {
                 SystemInfo systemInfo = ipSystemInfoMap.get(channelContext.getRemoteIp());
                 if(systemInfo == null) {
@@ -227,15 +221,15 @@ public class MessageHandlerAdapter {
                 } else {
                     systemInfo.setNetworkInterfaceInfoList(((BatchNetworkInterfaceInfo)msg).getNetworkInterfaceInfoList());
                 }
-                return true;
+            } else {
+                channelContext.invokeNextHandlerRead(msg);
             }
-            return false;
         }
     }
 
     public class BatchDiscMetricMessageHandler implements MessageHandler {
         @Override
-        public boolean handle(ChannelContext channelContext, Object msg) {
+        public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof BatchDiscMetric) {
                 SystemMetric systemMetric = ipSystemMetricMap.get(channelContext.getRemoteIp());
                 if(systemMetric == null) {
@@ -249,15 +243,15 @@ public class MessageHandlerAdapter {
                 System.out.println("ipSystemInfoMap:\n" + ipSystemInfoMap);
                 System.out.println("ipSystemMetricMap:\n" + ipSystemMetricMap);
                 System.out.println("-----------------------------------------------------------------------------------------------");
-                return true;
+            } else {
+                channelContext.invokeNextHandlerRead(msg);
             }
-            return false;
         }
     }
 
     public class BatchNetworkMetricMessageHandler implements MessageHandler {
         @Override
-        public boolean handle(ChannelContext channelContext, Object msg) {
+        public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof BatchNetworkMetric) {
                 SystemMetric systemMetric = ipSystemMetricMap.get(channelContext.getRemoteIp());
                 if(systemMetric == null) {
@@ -267,31 +261,31 @@ public class MessageHandlerAdapter {
                 } else {
                     systemMetric.setNetworkMetricList(((BatchNetworkMetric)msg).getNetworkMetricList());
                 }
-                return true;
+            } else {
+                channelContext.invokeNextHandlerRead(msg);
             }
-            return false;
         }
     }
 
     public static class CmdResponseMessageHandler implements MessageHandler  {
         @Override
-        public boolean handle(ChannelContext channelContext, Object msg) throws Exception {
+        public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof CmdResponse) {
                 System.out.printf("cmd 输出内容: %s%n", ((CmdResponse)msg).getOutput());
-                return true;
+            } else {
+                channelContext.invokeNextHandlerRead(msg);
             }
-            return false;
         }
     }
 
-    public static class HeartBeatMessageHandler implements MessageHandler  {
+    public static class HeartBeatMessageHandler implements MessageHandler {
         @Override
-        public boolean handle(ChannelContext channelContext, Object msg) throws Exception {
+        public void handle(ChannelContext channelContext, Object msg) throws Exception {
             if(msg instanceof HeartBeat) {
                 System.out.printf("心跳: 远程地址: %s%n", channelContext.getSocketChannel().getRemoteAddress());
-                return true;
+            } else {
+                channelContext.invokeNextHandlerRead(msg);
             }
-            return false;
         }
     }
 }

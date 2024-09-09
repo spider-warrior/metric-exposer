@@ -1,12 +1,15 @@
 package cn.t.metric.common.context;
 
 import cn.t.metric.common.exception.ChannelContextInitException;
-import cn.t.metric.common.util.MsgEncoder;
+import cn.t.metric.common.exception.MessageHandlerExecuteException;
+import cn.t.metric.common.handler.MessageHandler;
 import cn.t.metric.common.util.ChannelUtil;
+import cn.t.metric.common.util.MsgEncoder;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
+import java.util.Iterator;
 
 public class ChannelContext {
 
@@ -16,6 +19,7 @@ public class ChannelContext {
     private long lastReadTime;
     private long lastWriteTime;
     private long lastRwTime;
+    private Iterator<MessageHandler> it;
 
     public SocketChannel getSocketChannel() {
         return socketChannel;
@@ -77,8 +81,20 @@ public class ChannelContext {
             this.lastWriteTime = now;
             this.lastRwTime = now;
         } catch (IOException e) {
-            e.printStackTrace();
             System.out.printf("异常类型：%s, 详情: %s%n", e.getClass().getSimpleName(), e.getMessage());
+        }
+    }
+
+    public void invokeHandlerRead(Iterator<MessageHandler> it, Object msg) {
+        this.it = it;
+        this.invokeNextHandlerRead(msg);
+    }
+
+    public void invokeNextHandlerRead(Object msg) {
+        try {
+            it.next().handle(this, msg);
+        } catch (Exception e) {
+            throw new MessageHandlerExecuteException(e);
         }
     }
 }
