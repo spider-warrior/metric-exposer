@@ -11,8 +11,12 @@ public class SystemInfo {
     private String osVersion;
     //总物理内存大小
     private long totalPhysicalMemorySize;
+    //可用物理内存大小
+    private long freePhysicalMemorySize;
     //总swap大小
     private long totalSwapSpaceSize;
+    //可用Swap大小
+    private long freeSwapSize;
     //cpu数量
     private int processorCount;
     //磁盘
@@ -52,12 +56,28 @@ public class SystemInfo {
         this.totalPhysicalMemorySize = totalPhysicalMemorySize;
     }
 
+    public long getFreePhysicalMemorySize() {
+        return freePhysicalMemorySize;
+    }
+
+    public void setFreePhysicalMemorySize(long freePhysicalMemorySize) {
+        this.freePhysicalMemorySize = freePhysicalMemorySize;
+    }
+
     public long getTotalSwapSpaceSize() {
         return totalSwapSpaceSize;
     }
 
     public void setTotalSwapSpaceSize(long totalSwapSpaceSize) {
         this.totalSwapSpaceSize = totalSwapSpaceSize;
+    }
+
+    public long getFreeSwapSize() {
+        return freeSwapSize;
+    }
+
+    public void setFreeSwapSize(long freeSwapSize) {
+        this.freeSwapSize = freeSwapSize;
     }
 
     public int getProcessorCount() {
@@ -91,7 +111,9 @@ public class SystemInfo {
                 ", osArch='" + osArch + '\'' +
                 ", osVersion='" + osVersion + '\'' +
                 ", totalPhysicalMemorySize=" + totalPhysicalMemorySize +
+                ", freePhysicalMemorySize=" + freePhysicalMemorySize +
                 ", totalSwapSpaceSize=" + totalSwapSpaceSize +
+                ", freeSwapSize=" + freeSwapSize +
                 ", processorCount=" + processorCount +
                 ", discInfoList=" + discInfoList +
                 ", networkInterfaceInfoList=" + networkInterfaceInfoList +

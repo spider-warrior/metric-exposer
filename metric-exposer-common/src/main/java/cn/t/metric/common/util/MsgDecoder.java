@@ -228,8 +228,12 @@ public class MsgDecoder {
         systemInfo.setOsVersion(analyseString(buffer));
         //总物理内存大小
         systemInfo.setTotalPhysicalMemorySize(buffer.getLong());
+        //可用物理内存大小
+        systemInfo.setFreePhysicalMemorySize(buffer.getLong());
         //总swap大小
         systemInfo.setTotalSwapSpaceSize(buffer.getLong());
+        //可用Swap大小
+        systemInfo.setFreeSwapSize(buffer.getLong());
         //processor数量
         systemInfo.setProcessorCount(buffer.getInt());
         //磁盘

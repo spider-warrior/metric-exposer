@@ -205,8 +205,12 @@ public class MsgEncoder {
         writeString(buffer, info.getOsVersion());
         //总物理内存大小
         buffer.putLong(info.getTotalPhysicalMemorySize());
+        //剩余物理内存大小
+        buffer.putLong(info.getFreePhysicalMemorySize());
         //总swap大小
         buffer.putLong(info.getTotalSwapSpaceSize());
+        //剩余swap大小
+        buffer.putLong(info.getFreeSwapSize());
         //processor数量
         buffer.putInt(info.getProcessorCount());
         //磁盘

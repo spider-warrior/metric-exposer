@@ -6,8 +6,6 @@ import cn.t.metric.common.context.ChannelContextManager;
 import cn.t.metric.common.handler.impl.BizMessageHandler;
 import cn.t.metric.common.handler.impl.HeadMessageHandler;
 import cn.t.metric.common.handler.impl.TailMessageHandler;
-import cn.t.metric.common.message.infos.SystemInfo;
-import cn.t.metric.common.message.metrics.SystemMetric;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.MsgDecoder;
 import cn.t.metric.server.constants.MetricExposerServerStatus;
@@ -25,7 +23,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class MetricExposerServer {
@@ -34,8 +31,6 @@ public class MetricExposerServer {
     private final ChannelContextManager manager;
     private MetricExposerServerStatus status;
     private boolean loopRead = true;
-    private final Map<String, SystemInfo> ipSystemInfoMap = new ConcurrentHashMap<>();
-    private final Map<String, SystemMetric> ipSystemMetricMap = new ConcurrentHashMap<>();
     private final long examinePeriod = TimeUnit.SECONDS.toMillis(3);
     private long nextExamineTime = 0;
 

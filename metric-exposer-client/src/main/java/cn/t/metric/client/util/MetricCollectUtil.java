@@ -99,7 +99,9 @@ public class MetricCollectUtil {
         systemInfo.setOsArch(systemMXBean.getArch());
         systemInfo.setOsVersion(systemMXBean.getVersion());
         systemInfo.setTotalPhysicalMemorySize(systemMXBean.getTotalPhysicalMemorySize());
+        systemInfo.setFreePhysicalMemorySize(systemMXBean.getFreePhysicalMemorySize());
         systemInfo.setTotalSwapSpaceSize(systemMXBean.getTotalSwapSpaceSize());
+        systemInfo.setFreeSwapSize(systemMXBean.getFreeSwapSpaceSize());
         systemInfo.setProcessorCount(Runtime.getRuntime().availableProcessors());
         systemInfo.setDiscInfoList(collectDiscInfoList());
         systemInfo.setNetworkInterfaceInfoList(collectNetworkInterfaceInfoList());
