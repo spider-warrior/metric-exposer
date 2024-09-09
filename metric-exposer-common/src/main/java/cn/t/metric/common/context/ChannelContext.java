@@ -77,6 +77,7 @@ public class ChannelContext {
             this.lastWriteTime = now;
             this.lastRwTime = now;
         } catch (IOException e) {
+            e.printStackTrace();
             System.out.printf("异常类型：%s, 详情: %s%n", e.getClass().getSimpleName(), e.getMessage());
         }
     }

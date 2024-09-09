@@ -121,16 +121,16 @@ public class MetricExposerServer {
         if(length > 0) {
             //convert to read mode
             readBuffer.flip();
+            ChannelContext channelContext = ChannelUtil.getChannelContext(key);
+            long now = System.currentTimeMillis();
+            channelContext.setLastReadTime(now);
+            channelContext.setLastRwTime(now);
+            manager.modify(channelContext);
             while (true){
                 Object message = MsgDecoder.decode(readBuffer);
                 if(message == null) {
                     break;
                 } else {
-                    ChannelContext channelContext = ChannelUtil.getChannelContext(key);
-                    long now = System.currentTimeMillis();
-                    channelContext.setLastReadTime(now);
-                    channelContext.setLastRwTime(now);
-                    manager.modify(channelContext);
                     messageHandlerAdapter.handle(channelContext, message);
                 }
             }
