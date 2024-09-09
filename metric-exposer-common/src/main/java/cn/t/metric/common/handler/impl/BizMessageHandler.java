@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class BizMessageHandler {
+
     private final Map<String, SystemInfo> ipSystemInfoMap = new ConcurrentHashMap<>();
-    private final Map<String, SystemMetric> ipSystemMetricMap = new ConcurrentHashMap<>();
 
     public static Collection<MessageHandler> bizMessageHandlerList() {
         List<MessageHandler> messageHandlerList = new ArrayList<>();
@@ -99,7 +99,37 @@ public class BizMessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof SystemMetric) {
-                ipSystemMetricMap.put(channelContext.getRemoteIp(), (SystemMetric)msg);
+                SystemMetric systemMetric = (SystemMetric)msg;
+                SystemInfo systemInfo = ipSystemInfoMap.get(channelContext.getRemoteIp());
+                systemInfo.setFreePhysicalMemorySize(systemMetric.getFreePhysicalMemorySize());
+                systemInfo.setFreeSwapSize(systemMetric.getFreeSwapSize());
+                systemInfo.setSystemCpuLoad(systemMetric.getSystemCpuLoad());
+                systemMetric.setSystemCpuLoadAverage(systemMetric.getSystemCpuLoadAverage());
+                List<DiscMetric> discMetricList = systemMetric.getDiscMetricList();
+                List<DiscInfo> discInfoList = systemInfo.getDiscInfoList();
+                //磁盘可用空间
+                for (DiscMetric discMetric : discMetricList) {
+                    for (DiscInfo discInfo : discInfoList) {
+                        if(discMetric.getName().equals(discInfo.getName())) {
+                            discInfo.setFreeSize(discMetric.getFreeSize());
+                            break;
+                        }
+                    }
+                }
+                List<NetworkMetric> networkMetricList = systemMetric.getNetworkMetricList();
+                List<NetworkInterfaceInfo> networkInterfaceInfoList = systemInfo.getNetworkInterfaceInfoList();
+                //网卡网速
+                for (NetworkMetric networkMetric : networkMetricList) {
+                    for (NetworkInterfaceInfo networkInterfaceInfo : networkInterfaceInfoList) {
+                        if(networkMetric.getInterfaceName().equals(networkInterfaceInfo.getInterfaceName())) {
+                            networkInterfaceInfo.setReceiveBytes(networkMetric.getReceiveBytes());
+                            networkInterfaceInfo.setSendBytes(networkMetric.getSendBytes());
+                            networkInterfaceInfo.setDownloadBytePerSecond(networkMetric.getDownloadBytePerSecond());
+                            networkInterfaceInfo.setUploadBytePerSecond(networkMetric.getUploadBytePerSecond());
+                            break;
+                        }
+                    }
+                }
             } else {
                 channelContext.invokeNextHandlerRead(msg);
             }
