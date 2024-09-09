@@ -2,8 +2,9 @@ package cn.t.metric.client;
 
 import cn.t.metric.client.constants.MetricExposerClientStatus;
 import cn.t.metric.client.exception.MetricExposerClientException;
-import cn.t.metric.common.constants.ChannelAttrName;
 import cn.t.metric.common.context.ChannelContext;
+import cn.t.metric.common.handler.impl.HeadMessageHandler;
+import cn.t.metric.common.handler.impl.TailMessageHandler;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.MsgDecoder;
 
@@ -14,19 +15,17 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 public class MetricExposerClient {
 
-    private final MessageHandlerAdapter messageHandlerAdapter = new MessageHandlerAdapter();
     private final String serverHost;
     private final int serverPort;
 
+    private ChannelContext channelContext;
     private MetricExposerClientStatus status;
     private boolean loopRead = true;
 
@@ -36,10 +35,12 @@ public class MetricExposerClient {
             while (loopRead) {
                 try(SocketChannel socketChannel = connect(serverHost, serverPort)) {
                     status = MetricExposerClientStatus.STARTED;
-                    ChannelContext channelContext = new ChannelContext(socketChannel);
-                    Map<String, Object> attrs = new HashMap<>();
-                    attrs.put(ChannelAttrName.attrChannelContext, channelContext);
-                    socketChannel.register(selector, SelectionKey.OP_READ, attrs);
+                    channelContext = new ChannelContext(socketChannel);
+                    channelContext.addMessageHandler(new HeadMessageHandler());
+                    channelContext.addMessageHandler(ClientMessageHandler.handlerList());
+                    channelContext.addMessageHandler(new TailMessageHandler());
+                    //注册读取事件监听
+                    socketChannel.register(selector, SelectionKey.OP_READ);
                     // 开启采集metric任务
                     metricCollector.startTask(channelContext);
                     // 循环读取消息
@@ -67,7 +68,7 @@ public class MetricExposerClient {
         } catch (Exception e) {
             throw new MetricExposerClientException(e);
         } finally {
-            releaseResource();
+            status = MetricExposerClientStatus.STOPPED;
         }
     }
 
@@ -105,11 +106,10 @@ public class MetricExposerClient {
                 if(msg == null) {
                     break;
                 } else {
-                    ChannelContext channelContext = ChannelUtil.getChannelContext(key);
                     long now = System.currentTimeMillis();
                     channelContext.setLastReadTime(now);
                     channelContext.setLastRwTime(now);
-                    messageHandlerAdapter.handle(channelContext, msg);
+                    channelContext.invokeNextHandlerRead(msg);
                 }
             }
             //convert to write mode
@@ -138,13 +138,7 @@ public class MetricExposerClient {
     public void stop() {
         if(this.loopRead) {
             this.loopRead = false;
-            releaseResource();
         }
-    }
-
-    public void releaseResource() {
-        status = MetricExposerClientStatus.STOPPED;
-        System.out.println("MetricExposerClient中止!");
     }
 
     public MetricExposerClientStatus getStatus() {
