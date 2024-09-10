@@ -32,7 +32,6 @@ public class ChannelContextManager {
     }
 
     public void examineExpiredChannelContext() {
-        System.out.println("连接超时扫描,当前连接总数量: " + channelContextPriorityQueue.size());
         long now = System.currentTimeMillis();
         while (true) {
             ChannelContext channelContext = channelContextPriorityQueue.peek();

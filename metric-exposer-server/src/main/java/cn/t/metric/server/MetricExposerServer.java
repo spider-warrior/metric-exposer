@@ -115,7 +115,6 @@ public class MetricExposerServer {
         channelContext.addMessageHandler(ServerMessageHandler.bizMessageHandlerList(systemInfoRepository));
         channelContext.addMessageHandler(new TailMessageHandler());
         manager.add(channelContext);
-        System.out.printf("新建连接, 远程地址: %s, time: %d%n", socketChannel.getRemoteAddress(), System.currentTimeMillis());
     }
 
     private void handleReadEvent(SelectionKey key) throws IOException {
