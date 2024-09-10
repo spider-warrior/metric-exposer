@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +41,8 @@ public class MetricExposerClient {
                     channelContext.addMessageHandler(ClientMessageHandler.handlerList());
                     channelContext.addMessageHandler(new TailMessageHandler());
                     //注册读取事件监听
-                    socketChannel.register(selector, SelectionKey.OP_READ);
+//                    socketChannel.register(selector, SelectionKey.OP_READ, null);
+                    socketChannel.register(selector, SelectionKey.OP_READ, new HashMap<>());
                     // 开启采集metric任务
                     metricCollector.startTask(channelContext);
                     // 循环读取消息
@@ -51,12 +53,6 @@ public class MetricExposerClient {
                         }
                     }
                 } catch (Exception e) {
-                    for (SelectionKey key : selector.keys()) {
-                        if(key.isValid()) {
-                            System.out.printf("异常类型：%s, iops: %d, channel: %s, 详情: %s%n", e.getClass().getSimpleName(), key.interestOps(), key.channel(), e.getMessage());
-                            ChannelUtil.closeChannel(key);
-                        }
-                    }
                     if(loopRead) {
                         LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
                     }
