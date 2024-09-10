@@ -144,7 +144,7 @@ public class MetricExposerServer {
         }
     }
 
-    public void stop() {
+    public synchronized void stop() {
         if(this.loopRead) {
             this.loopRead = false;
             this.openedSelector.wakeup();
