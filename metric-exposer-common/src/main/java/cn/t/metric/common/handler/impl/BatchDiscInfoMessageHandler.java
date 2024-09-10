@@ -10,7 +10,7 @@ public class BatchDiscInfoMessageHandler extends AbstractMessageHandler {
     @Override
     public void handle(ChannelContext channelContext, Object msg) {
         if(msg instanceof BatchDiscInfo) {
-            SystemInfo systemInfo = systemInfoRepository.queryByIp(channelContext.getRemoteIp());
+            SystemInfo systemInfo = systemInfoRepository.queryById(channelContext.getRemoteIp());
             if(systemInfo == null) {
                 systemInfo = new SystemInfo();
                 systemInfo.setDiscInfoList(((BatchDiscInfo)msg).getDiscInfoList());

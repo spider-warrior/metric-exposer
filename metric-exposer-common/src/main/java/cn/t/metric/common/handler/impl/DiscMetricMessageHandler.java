@@ -14,7 +14,7 @@ public class DiscMetricMessageHandler extends AbstractMessageHandler {
     public void handle(ChannelContext channelContext, Object msg) {
         if(msg instanceof DiscMetric) {
             DiscMetric discMetric = (DiscMetric)msg;
-            SystemInfo systemInfo = systemInfoRepository.queryByIp(channelContext.getRemoteIp());
+            SystemInfo systemInfo = systemInfoRepository.queryById(channelContext.getRemoteIp());
             List<DiscInfo> discInfoList = systemInfo.getDiscInfoList();
             for (DiscInfo discInfo : discInfoList) {
                 if(discInfo.getName().equals(discMetric.getName())) {

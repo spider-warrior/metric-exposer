@@ -15,7 +15,7 @@ public class DiscInfoMessageHandler extends AbstractMessageHandler {
     @Override
     public void handle(ChannelContext channelContext, Object msg) {
         if(msg instanceof DiscInfo) {
-            SystemInfo systemInfo = systemInfoRepository.queryByIp(channelContext.getRemoteIp());
+            SystemInfo systemInfo = systemInfoRepository.queryById(channelContext.getRemoteIp());
             if(systemInfo == null) {
                 systemInfo = new SystemInfo();
                 List<DiscInfo> discInfoList = new ArrayList<>();

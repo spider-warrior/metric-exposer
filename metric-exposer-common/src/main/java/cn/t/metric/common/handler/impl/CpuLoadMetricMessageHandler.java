@@ -11,7 +11,7 @@ public class CpuLoadMetricMessageHandler extends AbstractMessageHandler {
     @Override
     public void handle(ChannelContext channelContext, Object msg) {
         if(msg instanceof CpuLoadMetric) {
-            SystemInfo systemInfo = systemInfoRepository.queryByIp(channelContext.getRemoteIp());
+            SystemInfo systemInfo = systemInfoRepository.queryById(channelContext.getRemoteIp());
             systemInfo.setSystemCpuLoad(((CpuLoadMetric)msg).getSystemCpuLoad());
             systemInfo.setSystemCpuLoadAverage(((CpuLoadMetric)msg).getSystemCpuLoadAverage());
         } else {

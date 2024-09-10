@@ -14,7 +14,7 @@ public class NetworkMetricMessageHandler extends AbstractMessageHandler {
     public void handle(ChannelContext channelContext, Object msg) {
         if(msg instanceof NetworkMetric) {
             NetworkMetric networkMetric = (NetworkMetric)msg;
-            SystemInfo systemInfo = systemInfoRepository.queryByIp(channelContext.getRemoteIp());
+            SystemInfo systemInfo = systemInfoRepository.queryById(channelContext.getRemoteIp());
             List<NetworkInterfaceInfo> networkInterfaceInfoList = systemInfo.getNetworkInterfaceInfoList();
             for (NetworkInterfaceInfo networkInterfaceInfo : networkInterfaceInfoList) {
                 if(networkInterfaceInfo.getInterfaceName().equals(networkMetric.getInterfaceName())) {

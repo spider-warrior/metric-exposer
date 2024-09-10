@@ -10,7 +10,7 @@ public class BatchDiscMetricMessageHandler extends AbstractMessageHandler {
     @Override
     public void handle(ChannelContext channelContext, Object msg) {
         if(msg instanceof BatchDiscMetric) {
-            PopulateUtil.populateDiscInfo(systemInfoRepository.queryByIp(channelContext.getRemoteIp()).getDiscInfoList(), ((BatchDiscMetric)msg).getDiscMetricList());
+            PopulateUtil.populateDiscInfo(systemInfoRepository.queryById(channelContext.getRemoteIp()).getDiscInfoList(), ((BatchDiscMetric)msg).getDiscMetricList());
         } else {
             channelContext.invokeNextHandlerRead(msg);
         }

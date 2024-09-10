@@ -12,7 +12,7 @@ public class SystemMetricMessageHandler extends AbstractMessageHandler {
     public void handle(ChannelContext channelContext, Object msg) {
         if(msg instanceof SystemMetric) {
             SystemMetric systemMetric = (SystemMetric)msg;
-            SystemInfo systemInfo = systemInfoRepository.queryByIp(channelContext.getRemoteIp());
+            SystemInfo systemInfo = systemInfoRepository.queryById(channelContext.getRemoteIp());
             systemInfo.setFreePhysicalMemorySize(systemMetric.getFreePhysicalMemorySize());
             systemInfo.setFreeSwapSize(systemMetric.getFreeSwapSize());
             systemInfo.setSystemCpuLoad(systemMetric.getSystemCpuLoad());

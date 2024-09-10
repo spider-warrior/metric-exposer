@@ -10,7 +10,7 @@ public class BatchNetworkInterfaceInfoMessageHandler extends AbstractMessageHand
     @Override
     public void handle(ChannelContext channelContext, Object msg) {
         if(msg instanceof BatchNetworkInterfaceInfo) {
-            SystemInfo systemInfo = systemInfoRepository.queryByIp(channelContext.getRemoteIp());
+            SystemInfo systemInfo = systemInfoRepository.queryById(channelContext.getRemoteIp());
             if(systemInfo == null) {
                 systemInfo = new SystemInfo();
                 systemInfo.setNetworkInterfaceInfoList(((BatchNetworkInterfaceInfo)msg).getNetworkInterfaceInfoList());

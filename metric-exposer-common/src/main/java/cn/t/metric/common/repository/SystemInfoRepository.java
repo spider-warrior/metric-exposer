@@ -9,23 +9,23 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SystemInfoRepository {
 
-    private static final Map<String, SystemInfo> ipSystemInfoMap = new ConcurrentHashMap<>();
+    private static final Map<String, SystemInfo> idSystemInfoMap = new ConcurrentHashMap<>();
 
-    public SystemInfo queryByIp(String ip) {
-        return ipSystemInfoMap.get(ip);
+    public SystemInfo queryById(String id) {
+        return idSystemInfoMap.get(id);
     }
-    public void save(String ip, SystemInfo systemInfo) {
-        ipSystemInfoMap.put(ip, systemInfo);
+    public void save(String id, SystemInfo systemInfo) {
+        idSystemInfoMap.put(id, systemInfo);
     }
-    public void remove(String ip) {
-        ipSystemInfoMap.remove(ip);
+    public void remove(String id) {
+        idSystemInfoMap.remove(id);
     }
 
-    public Set<String> allIpSet() {
-        return ipSystemInfoMap.keySet();
+    public Set<String> allIds() {
+        return idSystemInfoMap.keySet();
     }
 
     public Collection<SystemInfo> allSystemInfos() {
-        return ipSystemInfoMap.values();
+        return idSystemInfoMap.values();
     }
 }
