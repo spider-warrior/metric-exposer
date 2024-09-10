@@ -3,9 +3,10 @@ package cn.t.metric.server;
 import cn.t.metric.common.constants.ChannelAttrName;
 import cn.t.metric.common.context.ChannelContext;
 import cn.t.metric.common.context.ChannelContextManager;
-import cn.t.metric.common.handler.impl.BizMessageHandler;
 import cn.t.metric.common.handler.impl.HeadMessageHandler;
+import cn.t.metric.common.handler.impl.ServerMessageHandler;
 import cn.t.metric.common.handler.impl.TailMessageHandler;
+import cn.t.metric.common.repository.SystemInfoRepository;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.MsgDecoder;
 import cn.t.metric.server.constants.MetricExposerServerStatus;
@@ -15,7 +16,10 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
-import java.nio.channels.*;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -26,6 +30,7 @@ public class MetricExposerServer {
     private final int bindPrt;
     private final String bingAddress;
     private final ChannelContextManager manager;
+    private final SystemInfoRepository systemInfoRepository;
     private final long examinePeriod = TimeUnit.SECONDS.toMillis(3);
     private Selector openedSelector;
     private MetricExposerServerStatus status;
@@ -108,7 +113,7 @@ public class MetricExposerServer {
         socketChannel.register(key.selector(), SelectionKey.OP_READ, attrs);
         //添加消息处理器
         channelContext.addMessageHandler(new HeadMessageHandler());
-        channelContext.addMessageHandler(BizMessageHandler.bizMessageHandlerList());
+        channelContext.addMessageHandler(ServerMessageHandler.bizMessageHandlerList(systemInfoRepository));
         channelContext.addMessageHandler(new TailMessageHandler());
         manager.add(channelContext);
         System.out.printf("新建连接, 远程地址: %s, time: %d%n", socketChannel.getRemoteAddress(), System.currentTimeMillis());
@@ -155,10 +160,11 @@ public class MetricExposerServer {
         return status;
     }
 
-    public MetricExposerServer(int bindPrt, String bingAddress, ChannelContextManager manager) {
+    public MetricExposerServer(int bindPrt, String bingAddress, ChannelContextManager manager, SystemInfoRepository systemInfoRepository) {
         this.bindPrt = bindPrt;
         this.bingAddress = bingAddress;
         this.manager = manager;
+        this.systemInfoRepository = systemInfoRepository;
         this.status = MetricExposerServerStatus.INIT;
     }
 }

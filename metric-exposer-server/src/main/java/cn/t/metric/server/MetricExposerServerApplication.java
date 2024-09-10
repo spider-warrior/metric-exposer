@@ -1,6 +1,7 @@
 package cn.t.metric.server;
 
 import cn.t.metric.common.context.ChannelContextManager;
+import cn.t.metric.common.repository.SystemInfoRepository;
 
 import java.util.Scanner;
 
@@ -8,8 +9,7 @@ public class MetricExposerServerApplication {
     public static void main(String[] args) {
         int bindPrt = 5000;
         String bingAddress = "127.0.0.1";
-        ChannelContextManager manager = new ChannelContextManager();
-        MetricExposerServer metricExposerServer = new MetricExposerServer(bindPrt, bingAddress, manager);
+        MetricExposerServer metricExposerServer = new MetricExposerServer(bindPrt, bingAddress, new ChannelContextManager(), new SystemInfoRepository());
         Thread inputThread = new Thread(() -> {
             Scanner scanner = new Scanner(System.in);
             while (true) {

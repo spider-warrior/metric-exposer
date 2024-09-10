@@ -19,10 +19,9 @@ import java.util.concurrent.TimeUnit;
 public class MetricCollector {
 
     private static final ScheduledExecutorService scheduledExecutorService =  Executors.newScheduledThreadPool(2, new ExposerThreadFactory("exposer-client-"));
-    private static final List<ScheduledFuture<?>> scheduledFutureListList = new ArrayList<>(5);
+    private static final List<ScheduledFuture<?>> scheduledFutureListList = new ArrayList<>(4);
 
     public void startTask(ChannelContext channelContext) {
-        System.out.println("MetricCollector已就绪....");
         SystemInfo systemInfo = MetricCollectUtil.collectSystemInfo();
         if(channelContext.getSocketChannel().isOpen() && channelContext.getSocketChannel().isConnected()) {
             channelContext.write(systemInfo);
@@ -59,6 +58,7 @@ public class MetricCollector {
             }
         }, 0, 20, TimeUnit.SECONDS);
         scheduledFutureListList.add(discTaskFuture);
+        System.out.println("MetricCollector已就绪....");
     }
 
     public void cancelTask() {
