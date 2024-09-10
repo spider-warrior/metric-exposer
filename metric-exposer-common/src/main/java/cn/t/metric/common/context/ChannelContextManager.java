@@ -1,11 +1,8 @@
 package cn.t.metric.common.context;
 
-import cn.t.metric.common.util.ChannelUtil;
-
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -14,7 +11,7 @@ public class ChannelContextManager {
     private static final long ttlMills = TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS);
     private final List<String> tempList = new ArrayList<>(20);
 
-    private final PriorityBlockingQueue<ChannelContext> channelContextPriorityQueue = new PriorityBlockingQueue<>(10, (o1, o2) -> (int)(o1.getLastRwTime() - o2.getLastRwTime()));
+    private final Queue<ChannelContext> channelContextPriorityQueue = new PriorityBlockingQueue<>(10, (o1, o2) -> (int)(o1.getLastRwTime() - o2.getLastRwTime()));
 
     public void add(ChannelContext channelContext) {
         boolean success = channelContextPriorityQueue.offer(channelContext);
@@ -86,5 +83,9 @@ public class ChannelContextManager {
 
     public boolean clearChannelContext(ChannelContext channelContext) {
         return channelContextPriorityQueue.remove(channelContext);
+    }
+
+    public Collection<ChannelContext> allChannelContext() {
+        return Collections.unmodifiableCollection(channelContextPriorityQueue);
     }
 }

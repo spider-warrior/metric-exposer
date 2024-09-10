@@ -37,7 +37,6 @@ public class MetricExposerServer {
     private boolean loopRead = true;
     private long nextExamineTime = 0;
 
-
     public void start() {
         try (
                 Selector selector = Selector.open();
