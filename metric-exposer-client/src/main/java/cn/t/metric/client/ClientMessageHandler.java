@@ -27,8 +27,10 @@ public class ClientMessageHandler {
                 CmdResponse cmdResponse = new CmdResponse();
                 try {
                     String output = CommandUtil.execute(((CmdRequest)msg).getCmd());
+                    cmdResponse.setSuccess(true);
                     cmdResponse.setOutput(output);
                 } catch (Exception e) {
+                    cmdResponse.setSuccess(false);
                     cmdResponse.setOutput(ExceptionUtil.getErrorMessage(e));
                 }
                 channelContext.write(cmdResponse);

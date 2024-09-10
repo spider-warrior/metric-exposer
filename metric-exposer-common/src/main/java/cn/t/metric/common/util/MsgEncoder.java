@@ -113,6 +113,8 @@ public class MsgEncoder {
 
     public static ByteBuffer encodeCmdResponse(CmdResponse response) {
         ByteBuffer buffer = allocate(response);
+        //success
+        buffer.put(response.isSuccess() ? (byte)1 : 0b0);
         //output
         buffer = writeString(buffer, response.getOutput());
         //length

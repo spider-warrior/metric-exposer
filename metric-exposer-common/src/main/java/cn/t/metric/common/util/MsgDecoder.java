@@ -71,6 +71,8 @@ public class MsgDecoder {
 
     private static CmdResponse decodeCmdResponse(ByteBuffer buffer) {
         CmdResponse response = new CmdResponse();
+        byte success = buffer.get();
+        response.setSuccess(success != 0);
         response.setOutput(analyseString(buffer));
         return response;
     }
