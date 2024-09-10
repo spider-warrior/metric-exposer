@@ -107,7 +107,7 @@ public class MsgEncoder {
         writeString(buffer, request.getCmd());
         //length
         writeLength(buffer);
-        System.out.printf("encode %s, buffer size: %d%n", request.getClass().getSimpleName(), buffer.position());
+//        System.out.printf("encode %s, buffer size: %d%n", request.getClass().getSimpleName(), buffer.position());
         return buffer;
     }
 
@@ -117,7 +117,7 @@ public class MsgEncoder {
         buffer = writeString(buffer, response.getOutput());
         //length
         writeLength(buffer);
-        System.out.printf("encode %s, buffer size: %d%n", response.getClass().getSimpleName(), buffer.position());
+//        System.out.printf("encode %s, buffer size: %d%n", response.getClass().getSimpleName(), buffer.position());
         return buffer;
     }
 
@@ -129,7 +129,7 @@ public class MsgEncoder {
         writeDiscInfoCollection(buffer, batchDiscInfo.getDiscInfoList());
         //length
         writeLength(buffer);
-        System.out.printf("encode %s, buffer size: %d%n", batchDiscInfo.getClass().getSimpleName(), buffer.position());
+//        System.out.printf("encode %s, buffer size: %d%n", batchDiscInfo.getClass().getSimpleName(), buffer.position());
         return buffer;
     }
 
@@ -141,7 +141,7 @@ public class MsgEncoder {
         writeNetworkInterfaceInfoCollection(buffer, batchNetworkInterfaceInfo.getNetworkInterfaceInfoList());
         //length
         writeLength(buffer);
-        System.out.printf("encode %s, buffer size: %d%n", batchNetworkInterfaceInfo.getClass().getSimpleName(), buffer.position());
+//        System.out.printf("encode %s, buffer size: %d%n", batchNetworkInterfaceInfo.getClass().getSimpleName(), buffer.position());
         return buffer;
     }
 
@@ -153,7 +153,7 @@ public class MsgEncoder {
         writeDiscMetricCollection(buffer, batchDiscMetric.getDiscMetricList());
         //length
         writeLength(buffer);
-        System.out.printf("encode %s, buffer size: %d%n", batchDiscMetric.getClass().getSimpleName(), buffer.position());
+//        System.out.printf("encode %s, buffer size: %d%n", batchDiscMetric.getClass().getSimpleName(), buffer.position());
         return buffer;
     }
 
@@ -165,7 +165,7 @@ public class MsgEncoder {
         writeNetworkMetricCollection(buffer, batchNetworkMetric.getNetworkMetricList());
         //length
         writeLength(buffer);
-        System.out.printf("encode %s, buffer size: %d%n", batchNetworkMetric.getClass().getSimpleName(), buffer.position());
+//        System.out.printf("encode %s, buffer size: %d%n", batchNetworkMetric.getClass().getSimpleName(), buffer.position());
         return buffer;
     }
 
@@ -174,7 +174,7 @@ public class MsgEncoder {
         writeNetworkInterfaceInfo(buffer, info);
         //length
         writeLength(buffer);
-        System.out.printf("encode %s, buffer size: %d%n", info.getClass().getSimpleName(), buffer.position());
+//        System.out.printf("encode %s, buffer size: %d%n", info.getClass().getSimpleName(), buffer.position());
         return buffer;
     }
 
@@ -183,7 +183,7 @@ public class MsgEncoder {
         writeDiscInfo(buffer, info);
         //length
         writeLength(buffer);
-        System.out.printf("encode %s, buffer size: %d%n", info.getClass().getSimpleName(), buffer.position());
+//        System.out.printf("encode %s, buffer size: %d%n", info.getClass().getSimpleName(), buffer.position());
         return buffer;
     }
 
@@ -191,7 +191,7 @@ public class MsgEncoder {
         ByteBuffer buffer = allocate(heartBeat);
         //length
         writeLength(buffer);
-        System.out.printf("encode %s, buffer size: %d%n", heartBeat.getClass().getSimpleName(), buffer.position());
+//        System.out.printf("encode %s, buffer size: %d%n", heartBeat.getClass().getSimpleName(), buffer.position());
         return buffer;
     }
 
@@ -223,7 +223,7 @@ public class MsgEncoder {
         writeNetworkInterfaceInfoCollection(buffer, info.getNetworkInterfaceInfoList());
         //length
         writeLength(buffer);
-        System.out.printf("encode %s, buffer size: %d%n", info.getClass().getSimpleName(), buffer.position());
+//        System.out.printf("encode %s, buffer size: %d%n", info.getClass().getSimpleName(), buffer.position());
         return buffer;
     }
 
@@ -243,7 +243,7 @@ public class MsgEncoder {
         writeNetworkMetricCollection(buffer, metric.getNetworkMetricList());
         //length
         writeLength(buffer);
-        System.out.printf("encode %s, buffer size: %d%n", metric.getClass().getSimpleName(), buffer.position());
+//        System.out.printf("encode %s, buffer size: %d%n", metric.getClass().getSimpleName(), buffer.position());
         return buffer;
     }
 
@@ -255,7 +255,7 @@ public class MsgEncoder {
         buffer.putDouble(metric.getSystemCpuLoadAverage());
         //length
         writeLength(buffer);
-        System.out.printf("encode %s, buffer size: %d%n", metric.getClass().getSimpleName(), buffer.position());
+//        System.out.printf("encode %s, buffer size: %d%n", metric.getClass().getSimpleName(), buffer.position());
         return buffer;
     }
 
@@ -267,7 +267,7 @@ public class MsgEncoder {
         buffer.putLong(metric.getFreeSize());
         //length
         writeLength(buffer);
-        System.out.printf("encode %s, buffer size: %d%n", metric.getClass().getSimpleName(), buffer.position());
+//        System.out.printf("encode %s, buffer size: %d%n", metric.getClass().getSimpleName(), buffer.position());
         return buffer;
     }
 
@@ -279,7 +279,7 @@ public class MsgEncoder {
         buffer.putLong(metric.getSwapMemoryFree());
         //length
         writeLength(buffer);
-        System.out.printf("encode %s, buffer size: %d%n", metric.getClass().getSimpleName(), buffer.position());
+//        System.out.printf("encode %s, buffer size: %d%n", metric.getClass().getSimpleName(), buffer.position());
         return buffer;
     }
     public static ByteBuffer encode(NetworkMetric metric) {
@@ -296,7 +296,7 @@ public class MsgEncoder {
         buffer.putInt(metric.getDownloadBytePerSecond());
         //length
         writeLength(buffer);
-        System.out.printf("encode %s, buffer size: %d%n", metric.getClass().getSimpleName(), buffer.position());
+//        System.out.printf("encode %s, buffer size: %d%n", metric.getClass().getSimpleName(), buffer.position());
         return buffer;
     }
 

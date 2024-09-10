@@ -5,6 +5,7 @@ import cn.t.metric.common.handler.MessageHandler;
 import cn.t.metric.common.message.request.CmdRequest;
 import cn.t.metric.common.message.response.CmdResponse;
 import cn.t.metric.common.util.CommandUtil;
+import cn.t.metric.common.util.ExceptionUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,9 +24,13 @@ public class ClientMessageHandler {
         @Override
         public void handle(ChannelContext channelContext, Object msg) {
             if(msg instanceof CmdRequest) {
-                String output = CommandUtil.execute(((CmdRequest)msg).getCmd());
                 CmdResponse cmdResponse = new CmdResponse();
-                cmdResponse.setOutput(output);
+                try {
+                    String output = CommandUtil.execute(((CmdRequest)msg).getCmd());
+                    cmdResponse.setOutput(output);
+                } catch (Exception e) {
+                    cmdResponse.setOutput(ExceptionUtil.getErrorMessage(e));
+                }
                 channelContext.write(cmdResponse);
             } else {
                 channelContext.invokeNextHandlerRead(msg);

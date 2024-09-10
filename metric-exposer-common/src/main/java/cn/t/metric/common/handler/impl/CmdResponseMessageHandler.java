@@ -9,7 +9,7 @@ public class CmdResponseMessageHandler extends AbstractMessageHandler {
     @Override
     public void handle(ChannelContext channelContext, Object msg) {
         if(msg instanceof CmdResponse) {
-            System.out.printf("cmd 输出内容: %s%n", ((CmdResponse)msg).getOutput());
+            System.out.printf("cmd输出内容: %s%n", ((CmdResponse)msg).getOutput());
         } else {
             channelContext.invokeNextHandlerRead(msg);
         }

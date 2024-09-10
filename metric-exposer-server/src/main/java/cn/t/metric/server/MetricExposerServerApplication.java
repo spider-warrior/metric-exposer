@@ -63,7 +63,7 @@ public class MetricExposerServerApplication {
                     String ip = scanner.nextLine();
                     ChannelContext channelContext = getIpChannelContext(channelContextManager.allChannelContext(), ip);
                     if(channelContext == null) {
-                        System.out.print("ip实例不存在!");
+                        System.out.println("ip实例不存在!");
                     } else {
                         System.out.print("请输入命令: ");
                         String cmd = scanner.nextLine();
