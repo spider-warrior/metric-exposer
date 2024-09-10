@@ -54,16 +54,31 @@ public class PopulateUtil {
 
     public static void populateNetworkInterfaceInfo(List<NetworkInterfaceInfo> networkInterfaceInfoList, List<NetworkMetric> networkMetricList) {
         for (NetworkMetric networkMetric : networkMetricList) {
+            boolean modified = false;
             for (NetworkInterfaceInfo networkInterfaceInfo : networkInterfaceInfoList) {
                 if (networkMetric.getInterfaceName().equals(networkInterfaceInfo.getInterfaceName())) {
                     networkInterfaceInfo.setReceiveBytes(networkMetric.getReceiveBytes());
                     networkInterfaceInfo.setSendBytes(networkMetric.getSendBytes());
                     networkInterfaceInfo.setDownloadBytePerSecond(networkMetric.getDownloadBytePerSecond());
                     networkInterfaceInfo.setUploadBytePerSecond(networkMetric.getUploadBytePerSecond());
+                    modified = true;
                     break;
                 }
             }
+            if(!modified) {
+                networkInterfaceInfoList.add(toNetworkInterfaceInfo(networkMetric));
+            }
         }
+    }
+
+    public static NetworkInterfaceInfo toNetworkInterfaceInfo(NetworkMetric networkMetric) {
+        NetworkInterfaceInfo networkInterfaceInfo = new NetworkInterfaceInfo();
+        networkInterfaceInfo.setInterfaceName(networkMetric.getInterfaceName());
+        networkInterfaceInfo.setReceiveBytes(networkMetric.getReceiveBytes());
+        networkInterfaceInfo.setSendBytes(networkMetric.getSendBytes());
+        networkInterfaceInfo.setUploadBytePerSecond(networkMetric.getUploadBytePerSecond());
+        networkInterfaceInfo.setDownloadBytePerSecond(networkMetric.getDownloadBytePerSecond());
+        return networkInterfaceInfo;
     }
 
     public static void populateDiscInfo(List<DiscInfo> discInfoList, List<DiscMetric> discMetricList) {

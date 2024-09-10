@@ -1,6 +1,7 @@
 package cn.t.metric.client.collector.impl;
 
 import cn.t.metric.client.collector.NetWorkMetricCollector;
+import cn.t.metric.common.constants.NetworkInterfaceConstants;
 import cn.t.metric.common.constants.SystemConstants;
 import cn.t.metric.common.message.metrics.NetworkMetric;
 import cn.t.metric.common.message.metrics.batch.BatchNetworkMetric;
@@ -38,7 +39,7 @@ public class NetStatNetWorkMetricCollectorImpl implements NetWorkMetricCollector
         String fifLine = output.substring(forthLineEndIndex + SystemConstants.LINE_SEPARATOR_LENGTH, fifLineEndIndex);
         fifLine = fifLine.replaceAll("\\s{2,}", " ").trim();
         String[] elements = fifLine.split(" ");
-        networkMetric.setInterfaceName("___global___");
+        networkMetric.setInterfaceName(NetworkInterfaceConstants.networkinterfaceglobalname);
         networkMetric.setReceiveBytes(Long.parseLong(elements[1]) / 8);
         networkMetric.setSendBytes(Long.parseLong(elements[2]) / 8);
         return networkMetric;
