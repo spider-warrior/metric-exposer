@@ -8,11 +8,11 @@ import cn.t.metric.common.util.PopulateUtil;
 
 public class BatchNetworkMetricMessageHandler extends AbstractMessageHandler {
     @Override
-    public void handle(ChannelContext channelContext, Object msg) {
+    public void read(ChannelContext channelContext, Object msg) {
         if(msg instanceof BatchNetworkMetric) {
             PopulateUtil.populateNetworkInterfaceInfo(systemInfoRepository.queryById(channelContext.getRemoteIp()).getNetworkInterfaceInfoList(), ((BatchNetworkMetric)msg).getNetworkMetricList());
         } else {
-            channelContext.invokeNextHandlerRead(msg);
+            channelContext.invokeNextChannelRead(msg);
         }
     }
     public BatchNetworkMetricMessageHandler(SystemInfoRepository systemInfoRepository) {

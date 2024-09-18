@@ -6,7 +6,7 @@ import cn.t.metric.common.handler.MessageHandler;
 
 public class TailMessageHandler implements MessageHandler {
     @Override
-    public void handle(ChannelContext channelContext, Object msg) {
+    public void read(ChannelContext channelContext, Object msg) {
         throw new MessageHandlerExecuteException("未知消息: " + msg);
     }
 }

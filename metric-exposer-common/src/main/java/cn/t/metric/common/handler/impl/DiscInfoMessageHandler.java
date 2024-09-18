@@ -10,12 +10,12 @@ import cn.t.metric.common.util.PopulateUtil;
 public class DiscInfoMessageHandler extends AbstractMessageHandler {
 
     @Override
-    public void handle(ChannelContext channelContext, Object msg) {
+    public void read(ChannelContext channelContext, Object msg) {
         if(msg instanceof DiscInfo) {
             SystemInfo systemInfo = systemInfoRepository.queryById(channelContext.getRemoteIp());
             PopulateUtil.populateDiscInfo(systemInfo, (DiscInfo)msg);
         } else {
-            channelContext.invokeNextHandlerRead(msg);
+            channelContext.invokeNextChannelRead(msg);
         }
     }
 

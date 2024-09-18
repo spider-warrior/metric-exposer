@@ -9,7 +9,7 @@ import cn.t.metric.common.util.PopulateUtil;
 
 public class SystemMetricMessageHandler extends AbstractMessageHandler {
     @Override
-    public void handle(ChannelContext channelContext, Object msg) {
+    public void read(ChannelContext channelContext, Object msg) {
         if(msg instanceof SystemMetric) {
             SystemMetric systemMetric = (SystemMetric)msg;
             SystemInfo systemInfo = systemInfoRepository.queryById(channelContext.getRemoteIp());
@@ -22,7 +22,7 @@ public class SystemMetricMessageHandler extends AbstractMessageHandler {
             //网卡网速
             PopulateUtil.populateNetworkInterfaceInfo(systemInfo.getNetworkInterfaceInfoList(), systemMetric.getNetworkMetricList());
         } else {
-            channelContext.invokeNextHandlerRead(msg);
+            channelContext.invokeNextChannelRead(msg);
         }
     }
     public SystemMetricMessageHandler(SystemInfoRepository systemInfoRepository) {

@@ -8,13 +8,13 @@ import cn.t.metric.common.repository.SystemInfoRepository;
 
 public class MemoryMetricMessageHandler extends AbstractMessageHandler {
     @Override
-    public void handle(ChannelContext channelContext, Object msg) {
+    public void read(ChannelContext channelContext, Object msg) {
         if(msg instanceof MemoryMetric) {
             SystemInfo systemInfo = systemInfoRepository.queryById(channelContext.getRemoteIp());
             systemInfo.setFreePhysicalMemorySize(((MemoryMetric)msg).getPhysicalMemoryFree());
             systemInfo.setFreeSwapSize(((MemoryMetric)msg).getSwapMemoryFree());
         } else {
-            channelContext.invokeNextHandlerRead(msg);
+            channelContext.invokeNextChannelRead(msg);
         }
     }
     public MemoryMetricMessageHandler(SystemInfoRepository systemInfoRepository) {

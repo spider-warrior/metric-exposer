@@ -8,11 +8,11 @@ import cn.t.metric.common.repository.SystemInfoRepository;
 public class SystemInfoMessageHandler extends AbstractMessageHandler {
 
     @Override
-    public void handle(ChannelContext channelContext, Object msg) {
+    public void read(ChannelContext channelContext, Object msg) {
         if(msg instanceof SystemInfo) {
             systemInfoRepository.save(channelContext.getRemoteIp(), (SystemInfo)msg);
         } else {
-            channelContext.invokeNextHandlerRead(msg);
+            channelContext.invokeNextChannelRead(msg);
         }
     }
 

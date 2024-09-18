@@ -105,7 +105,7 @@ public class MetricExposerClient {
                     long now = System.currentTimeMillis();
                     channelContext.setLastReadTime(now);
                     channelContext.setLastRwTime(now);
-                    channelContext.invokeHandlerRead(msg);
+                    channelContext.invokeChannelRead(msg);
                 }
             }
             //convert to write mode

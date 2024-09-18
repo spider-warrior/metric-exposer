@@ -27,7 +27,7 @@ public class SingleThreadEventLoop implements Runnable {
                     while (it.hasNext()) {
                         SelectionKey key = it.next();
                         it.remove();
-                        channelContext.invokeHandlerRead(key);
+                        channelContext.invokeChannelRead(key);
                     }
                 }
             }

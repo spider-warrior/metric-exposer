@@ -10,12 +10,12 @@ import cn.t.metric.common.util.PopulateUtil;
 public class NetworkInterfaceInfoMessageHandler extends AbstractMessageHandler {
 
     @Override
-    public void handle(ChannelContext channelContext, Object msg) {
+    public void read(ChannelContext channelContext, Object msg) {
         if(msg instanceof NetworkInterfaceInfo) {
             SystemInfo systemInfo = systemInfoRepository.queryById(channelContext.getRemoteIp());
             PopulateUtil.populateNetworkInterfaceInfo(systemInfo, (NetworkInterfaceInfo)msg);
         } else {
-            channelContext.invokeNextHandlerRead(msg);
+            channelContext.invokeNextChannelRead(msg);
         }
     }
 

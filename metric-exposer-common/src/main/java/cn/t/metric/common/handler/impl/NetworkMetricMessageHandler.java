@@ -11,7 +11,7 @@ import java.util.List;
 
 public class NetworkMetricMessageHandler extends AbstractMessageHandler {
     @Override
-    public void handle(ChannelContext channelContext, Object msg) {
+    public void read(ChannelContext channelContext, Object msg) {
         if(msg instanceof NetworkMetric) {
             NetworkMetric networkMetric = (NetworkMetric)msg;
             SystemInfo systemInfo = systemInfoRepository.queryById(channelContext.getRemoteIp());
@@ -25,7 +25,7 @@ public class NetworkMetricMessageHandler extends AbstractMessageHandler {
                 }
             }
         } else {
-            channelContext.invokeNextHandlerRead(msg);
+            channelContext.invokeNextChannelRead(msg);
         }
     }
     public NetworkMetricMessageHandler(SystemInfoRepository systemInfoRepository) {

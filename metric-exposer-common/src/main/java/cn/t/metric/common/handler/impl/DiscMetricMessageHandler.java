@@ -11,7 +11,7 @@ import java.util.List;
 
 public class DiscMetricMessageHandler extends AbstractMessageHandler {
     @Override
-    public void handle(ChannelContext channelContext, Object msg) {
+    public void read(ChannelContext channelContext, Object msg) {
         if(msg instanceof DiscMetric) {
             DiscMetric discMetric = (DiscMetric)msg;
             SystemInfo systemInfo = systemInfoRepository.queryById(channelContext.getRemoteIp());
@@ -23,7 +23,7 @@ public class DiscMetricMessageHandler extends AbstractMessageHandler {
                 }
             }
         } else {
-            channelContext.invokeNextHandlerRead(msg);
+            channelContext.invokeNextChannelRead(msg);
         }
     }
     public DiscMetricMessageHandler(SystemInfoRepository systemInfoRepository) {

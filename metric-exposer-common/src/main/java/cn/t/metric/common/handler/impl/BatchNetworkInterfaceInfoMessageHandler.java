@@ -8,12 +8,12 @@ import cn.t.metric.common.repository.SystemInfoRepository;
 
 public class BatchNetworkInterfaceInfoMessageHandler extends AbstractMessageHandler {
     @Override
-    public void handle(ChannelContext channelContext, Object msg) {
+    public void read(ChannelContext channelContext, Object msg) {
         if(msg instanceof BatchNetworkInterfaceInfo) {
             SystemInfo systemInfo = systemInfoRepository.queryById(channelContext.getRemoteIp());
             systemInfo.setNetworkInterfaceInfoList(((BatchNetworkInterfaceInfo)msg).getNetworkInterfaceInfoList());
         } else {
-            channelContext.invokeNextHandlerRead(msg);
+            channelContext.invokeNextChannelRead(msg);
         }
     }
     public BatchNetworkInterfaceInfoMessageHandler(SystemInfoRepository systemInfoRepository) {

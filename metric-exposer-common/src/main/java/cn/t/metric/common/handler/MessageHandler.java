@@ -6,5 +6,5 @@ public interface MessageHandler {
     default void active(ChannelContext ctx) {
         //ignore
     }
-    void handle(ChannelContext channelContext, Object msg) throws Exception;
+    void read(ChannelContext channelContext, Object msg) throws Exception;
 }

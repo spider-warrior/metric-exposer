@@ -111,14 +111,14 @@ public class ChannelContext {
         this.messageHandlerList.addAll(messageHandlerCollection);
     }
 
-    public void invokeHandlerRead(Object msg) {
+    public void invokeChannelRead(Object msg) {
         this.messageReadIt = messageHandlerList.iterator();
-        this.invokeNextHandlerRead(msg);
+        this.invokeNextChannelRead(msg);
     }
 
-    public void invokeNextHandlerRead(Object msg) {
+    public void invokeNextChannelRead(Object msg) {
         try {
-            messageReadIt.next().handle(this, msg);
+            messageReadIt.next().read(this, msg);
         } catch (Exception e) {
             throw new MessageHandlerExecuteException(e);
         }

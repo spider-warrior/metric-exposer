@@ -135,7 +135,7 @@ public class MetricExposerServer {
                 if(message == null) {
                     break;
                 } else {
-                    channelContext.invokeHandlerRead(message);
+                    channelContext.invokeChannelRead(message);
                 }
             }
             //convert to write mode

@@ -8,12 +8,12 @@ import cn.t.metric.common.repository.SystemInfoRepository;
 
 public class BatchDiscInfoMessageHandler extends AbstractMessageHandler {
     @Override
-    public void handle(ChannelContext channelContext, Object msg) {
+    public void read(ChannelContext channelContext, Object msg) {
         if(msg instanceof BatchDiscInfo) {
             SystemInfo systemInfo = systemInfoRepository.queryById(channelContext.getRemoteIp());
             systemInfo.setDiscInfoList(((BatchDiscInfo)msg).getDiscInfoList());
         } else {
-            channelContext.invokeNextHandlerRead(msg);
+            channelContext.invokeNextChannelRead(msg);
         }
     }
     public BatchDiscInfoMessageHandler(SystemInfoRepository systemInfoRepository) {
