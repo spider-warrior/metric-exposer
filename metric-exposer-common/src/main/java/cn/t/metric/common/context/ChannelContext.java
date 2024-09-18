@@ -3,8 +3,6 @@ package cn.t.metric.common.context;
 import cn.t.metric.common.exception.ChannelContextInitException;
 import cn.t.metric.common.exception.MessageHandlerExecuteException;
 import cn.t.metric.common.handler.ChannelHandler;
-import cn.t.metric.common.util.ChannelUtil;
-import cn.t.metric.common.util.MsgEncoder;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -25,6 +23,7 @@ public class ChannelContext {
     private final List<ChannelHandler> channelHandlerList = new ArrayList<>();
     private Iterator<ChannelHandler> channelActiveIt;
     private Iterator<ChannelHandler> messageReadIt;
+    private Iterator<ChannelHandler> messageWriteIt;
 
     public SocketChannel getSocketChannel() {
         return socketChannel;
@@ -92,17 +91,6 @@ public class ChannelContext {
         }
     }
 
-    public void write(Object msg) {
-        try {
-            ChannelUtil.write(socketChannel, MsgEncoder.encode(msg));
-            long now = System.currentTimeMillis();
-            this.lastWriteTime = now;
-            this.lastRwTime = now;
-        } catch (IOException e) {
-            System.out.printf("异常类型：%s, 详情: %s%n", e.getClass().getSimpleName(), e.getMessage());
-        }
-    }
-
     public void addMessageHandler(ChannelHandler channelHandler) {
         this.channelHandlerList.add(channelHandler);
     }
@@ -119,6 +107,22 @@ public class ChannelContext {
     public void invokeNextChannelRead(Object msg) {
         try {
             messageReadIt.next().read(this, msg);
+        } catch (Exception e) {
+            throw new MessageHandlerExecuteException(e);
+        }
+    }
+
+    public void invokeChannelWrite(Object msg) {
+        this.messageWriteIt = channelHandlerList.iterator();
+        this.invokeNextChannelWrite(msg);
+    }
+
+    public void invokeNextChannelWrite(Object msg) {
+        try {
+            messageWriteIt.next().write(this, msg);
+            long now = System.currentTimeMillis();
+            this.lastWriteTime = now;
+            this.lastRwTime = now;
         } catch (Exception e) {
             throw new MessageHandlerExecuteException(e);
         }

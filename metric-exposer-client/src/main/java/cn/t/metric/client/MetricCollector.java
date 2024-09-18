@@ -24,13 +24,13 @@ public class MetricCollector {
     public void startTask(ChannelContext channelContext) {
         SystemInfo systemInfo = MetricCollectUtil.collectSystemInfo();
         if(channelContext.getSocketChannel().isOpen() && channelContext.getSocketChannel().isConnected()) {
-            channelContext.write(systemInfo);
+            channelContext.invokeChannelWrite(systemInfo);
         }
         //cpu采集
         ScheduledFuture<?> cpuTaskFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
             CpuLoadMetric message = MetricCollectUtil.collectCpuMetric();
             if(channelContext.getSocketChannel().isOpen() && channelContext.getSocketChannel().isConnected()) {
-                channelContext.write(message);
+                channelContext.invokeChannelWrite(message);
             }
         }, 0, 5, TimeUnit.SECONDS);
         scheduledFutureListList.add(cpuTaskFuture);
@@ -38,7 +38,7 @@ public class MetricCollector {
         ScheduledFuture<?> memoryTaskFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
             MemoryMetric message = MetricCollectUtil.collectMemoryMetric();
             if(channelContext.getSocketChannel().isOpen() && channelContext.getSocketChannel().isConnected()) {
-                channelContext.write(message);
+                channelContext.invokeChannelWrite(message);
             }
         }, 0, 5, TimeUnit.SECONDS);
         scheduledFutureListList.add(memoryTaskFuture);
@@ -46,7 +46,7 @@ public class MetricCollector {
         ScheduledFuture<?> networkTaskFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
             BatchNetworkMetric message = MetricCollectUtil.collectBatchMetric();
             if(channelContext.getSocketChannel().isOpen() && channelContext.getSocketChannel().isConnected()) {
-                channelContext.write(message);
+                channelContext.invokeChannelWrite(message);
             }
         }, 0, 5, TimeUnit.SECONDS);
         scheduledFutureListList.add(networkTaskFuture);
@@ -54,7 +54,7 @@ public class MetricCollector {
         ScheduledFuture<?> discTaskFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
             BatchDiscMetric message = MetricCollectUtil.collectBatchDiscMetric();
             if(channelContext.getSocketChannel().isOpen() && channelContext.getSocketChannel().isConnected()) {
-                channelContext.write(message);
+                channelContext.invokeChannelWrite(message);
             }
         }, 0, 20, TimeUnit.SECONDS);
         scheduledFutureListList.add(discTaskFuture);

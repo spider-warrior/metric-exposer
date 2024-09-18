@@ -69,7 +69,7 @@ public class MetricExposerServerApplication {
                         String cmd = scanner.nextLine();
                         CmdRequest cmdRequest = new CmdRequest();
                         cmdRequest.setCmd(cmd);
-                        channelContext.write(cmdRequest);
+                        channelContext.invokeChannelWrite(cmdRequest);
                     }
                 }
             }

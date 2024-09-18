@@ -7,4 +7,7 @@ public interface ChannelHandler {
         //ignore
     }
     void read(ChannelContext channelContext, Object msg) throws Exception;
+    default void write(ChannelContext channelContext, Object msg) {
+        channelContext.invokeNextChannelWrite(msg);
+    }
 }

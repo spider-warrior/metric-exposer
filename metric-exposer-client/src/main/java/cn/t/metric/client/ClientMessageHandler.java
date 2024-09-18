@@ -33,7 +33,7 @@ public class ClientMessageHandler {
                     cmdResponse.setSuccess(false);
                     cmdResponse.setOutput(ExceptionUtil.getErrorMessage(e));
                 }
-                channelContext.write(cmdResponse);
+                channelContext.invokeChannelWrite(cmdResponse);
             } else {
                 channelContext.invokeNextChannelRead(msg);
             }

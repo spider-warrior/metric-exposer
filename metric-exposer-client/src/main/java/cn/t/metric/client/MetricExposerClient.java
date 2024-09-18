@@ -4,7 +4,6 @@ import cn.t.metric.client.constants.MetricExposerClientStatus;
 import cn.t.metric.client.exception.MetricExposerClientException;
 import cn.t.metric.common.context.ChannelContext;
 import cn.t.metric.common.handler.impl.HeadChannelHandler;
-import cn.t.metric.common.handler.impl.TailChannelHandler;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.MsgDecoder;
 
@@ -37,11 +36,8 @@ public class MetricExposerClient {
                 try(SocketChannel socketChannel = connect(serverHost, serverPort)) {
                     status = MetricExposerClientStatus.STARTED;
                     channelContext = new ChannelContext(socketChannel);
-                    channelContext.addMessageHandler(new HeadChannelHandler());
-                    channelContext.addMessageHandler(ClientMessageHandler.handlerList());
-                    channelContext.addMessageHandler(new TailChannelHandler());
+                    channelContext.addMessageHandler(new HeadChannelHandler(ClientMessageHandler.handlerList()));
                     //注册读取事件监听
-//                    socketChannel.register(selector, SelectionKey.OP_READ, null);
                     socketChannel.register(selector, SelectionKey.OP_READ, new HashMap<>());
                     // 开启采集metric任务
                     metricCollector.startTask(channelContext);
