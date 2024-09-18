@@ -23,7 +23,8 @@ public class ChannelContext {
     private long lastWriteTime;
     private long lastRwTime;
     private final List<MessageHandler> messageHandlerList = new ArrayList<>();
-    private Iterator<MessageHandler> it;
+    private Iterator<MessageHandler> channelActiveIt;
+    private Iterator<MessageHandler> messageReadIt;
 
     public SocketChannel getSocketChannel() {
         return socketChannel;
@@ -78,6 +79,19 @@ public class ChannelContext {
         }
     }
 
+    public void invokeChannelReady() {
+        this.channelActiveIt = messageHandlerList.iterator();
+        this.invokeNextChannelReady();
+    }
+    public void invokeNextChannelReady() {
+        try {
+            messageReadIt.next().active(this);
+        } catch (Exception e) {
+            throw new MessageHandlerExecuteException(e);
+        }
+    }
+
+
     public void write(Object msg) {
         try {
             ChannelUtil.write(socketChannel, MsgEncoder.encode(msg));
@@ -98,13 +112,13 @@ public class ChannelContext {
     }
 
     public void invokeHandlerRead(Object msg) {
-        this.it = messageHandlerList.iterator();
+        this.messageReadIt = messageHandlerList.iterator();
         this.invokeNextHandlerRead(msg);
     }
 
     public void invokeNextHandlerRead(Object msg) {
         try {
-            it.next().handle(this, msg);
+            messageReadIt.next().handle(this, msg);
         } catch (Exception e) {
             throw new MessageHandlerExecuteException(e);
         }
