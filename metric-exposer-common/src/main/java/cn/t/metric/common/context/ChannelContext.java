@@ -83,6 +83,7 @@ public class ChannelContext {
         this.channelActiveIt = messageHandlerList.iterator();
         this.invokeNextChannelReady();
     }
+
     public void invokeNextChannelReady() {
         try {
             messageReadIt.next().active(this);
@@ -90,7 +91,6 @@ public class ChannelContext {
             throw new MessageHandlerExecuteException(e);
         }
     }
-
 
     public void write(Object msg) {
         try {
