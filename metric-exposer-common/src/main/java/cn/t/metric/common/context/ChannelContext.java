@@ -2,7 +2,7 @@ package cn.t.metric.common.context;
 
 import cn.t.metric.common.exception.ChannelContextInitException;
 import cn.t.metric.common.exception.MessageHandlerExecuteException;
-import cn.t.metric.common.handler.MessageHandler;
+import cn.t.metric.common.handler.ChannelHandler;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.MsgEncoder;
 
@@ -22,9 +22,9 @@ public class ChannelContext {
     private long lastReadTime;
     private long lastWriteTime;
     private long lastRwTime;
-    private final List<MessageHandler> messageHandlerList = new ArrayList<>();
-    private Iterator<MessageHandler> channelActiveIt;
-    private Iterator<MessageHandler> messageReadIt;
+    private final List<ChannelHandler> channelHandlerList = new ArrayList<>();
+    private Iterator<ChannelHandler> channelActiveIt;
+    private Iterator<ChannelHandler> messageReadIt;
 
     public SocketChannel getSocketChannel() {
         return socketChannel;
@@ -80,7 +80,7 @@ public class ChannelContext {
     }
 
     public void invokeChannelReady() {
-        this.channelActiveIt = messageHandlerList.iterator();
+        this.channelActiveIt = channelHandlerList.iterator();
         this.invokeNextChannelReady();
     }
 
@@ -103,16 +103,16 @@ public class ChannelContext {
         }
     }
 
-    public void addMessageHandler(MessageHandler messageHandler) {
-        this.messageHandlerList.add(messageHandler);
+    public void addMessageHandler(ChannelHandler channelHandler) {
+        this.channelHandlerList.add(channelHandler);
     }
 
-    public void addMessageHandler(Collection<MessageHandler> messageHandlerCollection) {
-        this.messageHandlerList.addAll(messageHandlerCollection);
+    public void addMessageHandler(Collection<ChannelHandler> channelHandlerCollection) {
+        this.channelHandlerList.addAll(channelHandlerCollection);
     }
 
     public void invokeChannelRead(Object msg) {
-        this.messageReadIt = messageHandlerList.iterator();
+        this.messageReadIt = channelHandlerList.iterator();
         this.invokeNextChannelRead(msg);
     }
 

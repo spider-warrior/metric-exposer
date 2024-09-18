@@ -1,7 +1,7 @@
 package cn.t.metric.common.handler.impl;
 
 import cn.t.metric.common.context.ChannelContext;
-import cn.t.metric.common.handler.AbstractMessageHandler;
+import cn.t.metric.common.handler.AbstractChannelHandler;
 import cn.t.metric.common.message.infos.DiscInfo;
 import cn.t.metric.common.message.infos.SystemInfo;
 import cn.t.metric.common.message.metrics.DiscMetric;
@@ -9,7 +9,7 @@ import cn.t.metric.common.repository.SystemInfoRepository;
 
 import java.util.List;
 
-public class DiscMetricMessageHandler extends AbstractMessageHandler {
+public class DiscMetricChannelHandler extends AbstractChannelHandler {
     @Override
     public void read(ChannelContext channelContext, Object msg) {
         if(msg instanceof DiscMetric) {
@@ -26,7 +26,7 @@ public class DiscMetricMessageHandler extends AbstractMessageHandler {
             channelContext.invokeNextChannelRead(msg);
         }
     }
-    public DiscMetricMessageHandler(SystemInfoRepository systemInfoRepository) {
+    public DiscMetricChannelHandler(SystemInfoRepository systemInfoRepository) {
         super(systemInfoRepository);
     }
 }

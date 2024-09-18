@@ -3,8 +3,8 @@ package cn.t.metric.client;
 import cn.t.metric.client.constants.MetricExposerClientStatus;
 import cn.t.metric.client.exception.MetricExposerClientException;
 import cn.t.metric.common.context.ChannelContext;
-import cn.t.metric.common.handler.impl.HeadMessageHandler;
-import cn.t.metric.common.handler.impl.TailMessageHandler;
+import cn.t.metric.common.handler.impl.HeadChannelHandler;
+import cn.t.metric.common.handler.impl.TailChannelHandler;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.MsgDecoder;
 
@@ -37,9 +37,9 @@ public class MetricExposerClient {
                 try(SocketChannel socketChannel = connect(serverHost, serverPort)) {
                     status = MetricExposerClientStatus.STARTED;
                     channelContext = new ChannelContext(socketChannel);
-                    channelContext.addMessageHandler(new HeadMessageHandler());
+                    channelContext.addMessageHandler(new HeadChannelHandler());
                     channelContext.addMessageHandler(ClientMessageHandler.handlerList());
-                    channelContext.addMessageHandler(new TailMessageHandler());
+                    channelContext.addMessageHandler(new TailChannelHandler());
                     //注册读取事件监听
 //                    socketChannel.register(selector, SelectionKey.OP_READ, null);
                     socketChannel.register(selector, SelectionKey.OP_READ, new HashMap<>());

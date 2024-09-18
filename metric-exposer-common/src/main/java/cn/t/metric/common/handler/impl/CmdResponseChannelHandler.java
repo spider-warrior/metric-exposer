@@ -1,11 +1,11 @@
 package cn.t.metric.common.handler.impl;
 
 import cn.t.metric.common.context.ChannelContext;
-import cn.t.metric.common.handler.AbstractMessageHandler;
+import cn.t.metric.common.handler.AbstractChannelHandler;
 import cn.t.metric.common.message.response.CmdResponse;
 import cn.t.metric.common.repository.SystemInfoRepository;
 
-public class CmdResponseMessageHandler extends AbstractMessageHandler {
+public class CmdResponseChannelHandler extends AbstractChannelHandler {
     @Override
     public void read(ChannelContext channelContext, Object msg) {
         if(msg instanceof CmdResponse) {
@@ -15,7 +15,7 @@ public class CmdResponseMessageHandler extends AbstractMessageHandler {
             channelContext.invokeNextChannelRead(msg);
         }
     }
-    public CmdResponseMessageHandler(SystemInfoRepository systemInfoRepository) {
+    public CmdResponseChannelHandler(SystemInfoRepository systemInfoRepository) {
         super(systemInfoRepository);
     }
 }

@@ -1,11 +1,11 @@
 package cn.t.metric.common.handler.impl;
 
 import cn.t.metric.common.context.ChannelContext;
-import cn.t.metric.common.handler.AbstractMessageHandler;
+import cn.t.metric.common.handler.AbstractChannelHandler;
 import cn.t.metric.common.message.infos.SystemInfo;
 import cn.t.metric.common.repository.SystemInfoRepository;
 
-public class SystemInfoMessageHandler extends AbstractMessageHandler {
+public class SystemInfoChannelHandler extends AbstractChannelHandler {
 
     @Override
     public void read(ChannelContext channelContext, Object msg) {
@@ -16,7 +16,7 @@ public class SystemInfoMessageHandler extends AbstractMessageHandler {
         }
     }
 
-    public SystemInfoMessageHandler(SystemInfoRepository systemInfoRepository) {
+    public SystemInfoChannelHandler(SystemInfoRepository systemInfoRepository) {
         super(systemInfoRepository);
     }
 }

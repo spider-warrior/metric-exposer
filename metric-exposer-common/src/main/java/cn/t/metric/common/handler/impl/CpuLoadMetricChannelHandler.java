@@ -1,12 +1,12 @@
 package cn.t.metric.common.handler.impl;
 
 import cn.t.metric.common.context.ChannelContext;
-import cn.t.metric.common.handler.AbstractMessageHandler;
+import cn.t.metric.common.handler.AbstractChannelHandler;
 import cn.t.metric.common.message.infos.SystemInfo;
 import cn.t.metric.common.message.metrics.CpuLoadMetric;
 import cn.t.metric.common.repository.SystemInfoRepository;
 
-public class CpuLoadMetricMessageHandler extends AbstractMessageHandler {
+public class CpuLoadMetricChannelHandler extends AbstractChannelHandler {
 
     @Override
     public void read(ChannelContext channelContext, Object msg) {
@@ -19,7 +19,7 @@ public class CpuLoadMetricMessageHandler extends AbstractMessageHandler {
         }
     }
 
-    public CpuLoadMetricMessageHandler(SystemInfoRepository systemInfoRepository) {
+    public CpuLoadMetricChannelHandler(SystemInfoRepository systemInfoRepository) {
         super(systemInfoRepository);
     }
 }

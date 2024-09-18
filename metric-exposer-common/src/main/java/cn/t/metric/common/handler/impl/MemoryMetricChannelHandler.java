@@ -1,12 +1,12 @@
 package cn.t.metric.common.handler.impl;
 
 import cn.t.metric.common.context.ChannelContext;
-import cn.t.metric.common.handler.AbstractMessageHandler;
+import cn.t.metric.common.handler.AbstractChannelHandler;
 import cn.t.metric.common.message.infos.SystemInfo;
 import cn.t.metric.common.message.metrics.MemoryMetric;
 import cn.t.metric.common.repository.SystemInfoRepository;
 
-public class MemoryMetricMessageHandler extends AbstractMessageHandler {
+public class MemoryMetricChannelHandler extends AbstractChannelHandler {
     @Override
     public void read(ChannelContext channelContext, Object msg) {
         if(msg instanceof MemoryMetric) {
@@ -17,7 +17,7 @@ public class MemoryMetricMessageHandler extends AbstractMessageHandler {
             channelContext.invokeNextChannelRead(msg);
         }
     }
-    public MemoryMetricMessageHandler(SystemInfoRepository systemInfoRepository) {
+    public MemoryMetricChannelHandler(SystemInfoRepository systemInfoRepository) {
         super(systemInfoRepository);
     }
 }

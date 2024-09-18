@@ -1,11 +1,11 @@
 package cn.t.metric.common.handler.impl;
 
 import cn.t.metric.common.context.ChannelContext;
-import cn.t.metric.common.handler.AbstractMessageHandler;
+import cn.t.metric.common.handler.AbstractChannelHandler;
 import cn.t.metric.common.message.HeartBeat;
 import cn.t.metric.common.repository.SystemInfoRepository;
 
-public class HeartBeatMessageHandler extends AbstractMessageHandler {
+public class HeartBeatChannelHandler extends AbstractChannelHandler {
     @Override
     public void read(ChannelContext channelContext, Object msg) throws Exception {
         if(msg instanceof HeartBeat) {
@@ -14,7 +14,7 @@ public class HeartBeatMessageHandler extends AbstractMessageHandler {
             channelContext.invokeNextChannelRead(msg);
         }
     }
-    public HeartBeatMessageHandler(SystemInfoRepository systemInfoRepository) {
+    public HeartBeatChannelHandler(SystemInfoRepository systemInfoRepository) {
         super(systemInfoRepository);
     }
 }

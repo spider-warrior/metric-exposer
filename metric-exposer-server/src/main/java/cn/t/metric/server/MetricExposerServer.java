@@ -3,9 +3,9 @@ package cn.t.metric.server;
 import cn.t.metric.common.constants.ChannelAttrName;
 import cn.t.metric.common.context.ChannelContext;
 import cn.t.metric.common.context.ChannelContextManager;
-import cn.t.metric.common.handler.impl.HeadMessageHandler;
+import cn.t.metric.common.handler.impl.HeadChannelHandler;
 import cn.t.metric.common.handler.impl.ServerMessageHandler;
-import cn.t.metric.common.handler.impl.TailMessageHandler;
+import cn.t.metric.common.handler.impl.TailChannelHandler;
 import cn.t.metric.common.repository.SystemInfoRepository;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.MsgDecoder;
@@ -111,9 +111,9 @@ public class MetricExposerServer {
         attrs.put(ChannelAttrName.attrChannelContext, channelContext);
         socketChannel.register(key.selector(), SelectionKey.OP_READ, attrs);
         //添加消息处理器
-        channelContext.addMessageHandler(new HeadMessageHandler());
+        channelContext.addMessageHandler(new HeadChannelHandler());
         channelContext.addMessageHandler(ServerMessageHandler.bizMessageHandlerList(systemInfoRepository));
-        channelContext.addMessageHandler(new TailMessageHandler());
+        channelContext.addMessageHandler(new TailChannelHandler());
         manager.add(channelContext);
     }
 

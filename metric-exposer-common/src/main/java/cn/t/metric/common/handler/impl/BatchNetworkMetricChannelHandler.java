@@ -1,12 +1,12 @@
 package cn.t.metric.common.handler.impl;
 
 import cn.t.metric.common.context.ChannelContext;
-import cn.t.metric.common.handler.AbstractMessageHandler;
+import cn.t.metric.common.handler.AbstractChannelHandler;
 import cn.t.metric.common.message.metrics.batch.BatchNetworkMetric;
 import cn.t.metric.common.repository.SystemInfoRepository;
 import cn.t.metric.common.util.PopulateUtil;
 
-public class BatchNetworkMetricMessageHandler extends AbstractMessageHandler {
+public class BatchNetworkMetricChannelHandler extends AbstractChannelHandler {
     @Override
     public void read(ChannelContext channelContext, Object msg) {
         if(msg instanceof BatchNetworkMetric) {
@@ -15,7 +15,7 @@ public class BatchNetworkMetricMessageHandler extends AbstractMessageHandler {
             channelContext.invokeNextChannelRead(msg);
         }
     }
-    public BatchNetworkMetricMessageHandler(SystemInfoRepository systemInfoRepository) {
+    public BatchNetworkMetricChannelHandler(SystemInfoRepository systemInfoRepository) {
         super(systemInfoRepository);
     }
 }
