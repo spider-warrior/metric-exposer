@@ -7,6 +7,7 @@ import cn.t.metric.common.constants.ChannelAttrName;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.NetworkChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Map;
@@ -29,8 +30,8 @@ public class ChannelUtil {
         Optional.ofNullable(getChannelContext(key)).ifPresent(ChannelContext::close);
     }
 
-    public static ChannelContext getChannelContext(SelectionKey key) {
-        return (ChannelContext)ChannelUtil.getAttachment(key).get(ChannelAttrName.attrChannelContext);
+    public static ChannelContext<? extends NetworkChannel> getChannelContext(SelectionKey key) {
+        return (ChannelContext<? extends NetworkChannel>)ChannelUtil.getAttachment(key).get(ChannelAttrName.attrChannelContext);
     }
 
     @SuppressWarnings("unchecked")

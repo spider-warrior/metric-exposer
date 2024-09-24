@@ -1,102 +1,51 @@
 package cn.t.metric.common.context;
 
-import cn.t.metric.common.exception.ChannelContextInitException;
-import cn.t.metric.common.exception.MessageHandlerExecuteException;
 import cn.t.metric.common.handler.ChannelHandler;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.NetworkChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-public class ChannelContext {
+public class ChannelContext<C extends NetworkChannel> {
 
-    private final SocketChannel socketChannel;
-    private final String remoteIp;
-    private final int remotePort;
-    private long lastReadTime;
-    private long lastWriteTime;
-    private long lastRwTime;
-    private final List<ChannelHandler> channelHandlerList = new ArrayList<>();
-    private Iterator<ChannelHandler> channelActiveIt;
-    private Iterator<ChannelHandler> messageReadIt;
-    private Iterator<ChannelHandler> messageWriteIt;
+    private final C channel;
+    private final List<ChannelHandler<C>> channelHandlerList = new ArrayList<>();
+    private Iterator<ChannelHandler<C>> channelReadyIt;
+    private Iterator<ChannelHandler<C>> messageReadIt;
+    private Iterator<ChannelHandler<C>> messageWriteIt;
 
-    public SocketChannel getSocketChannel() {
-        return socketChannel;
-    }
-
-    public String getRemoteIp() {
-        return remoteIp;
-    }
-
-    public int getRemotePort() {
-        return remotePort;
-    }
-
-    public long getLastReadTime() {
-        return lastReadTime;
-    }
-
-    public void setLastReadTime(long lastReadTime) {
-        this.lastReadTime = lastReadTime;
-    }
-
-    public long getLastWriteTime() {
-        return lastWriteTime;
-    }
-
-    public void setLastWriteTime(long lastWriteTime) {
-        this.lastWriteTime = lastWriteTime;
-    }
-
-    public long getLastRwTime() {
-        return lastRwTime;
-    }
-
-    public void setLastRwTime(long lastRwTime) {
-        this.lastRwTime = lastRwTime;
+    public C getChannel() {
+        return channel;
     }
 
     public void close() {
-        if(this.socketChannel.isOpen()) {
-            try { this.socketChannel.close(); } catch (IOException ignore) {}
+        if(this.channel.isOpen()) {
+            try { this.channel.close(); } catch (IOException ignore) {}
         }
     }
 
-    public ChannelContext(SocketChannel socketChannel) {
-        this.socketChannel = socketChannel;
-        try {
-            InetSocketAddress socketAddress = (InetSocketAddress)socketChannel.getRemoteAddress();
-            this.remoteIp = socketAddress.getHostString();
-            this.remotePort = socketAddress.getPort();
-        } catch (IOException e) {
-            throw new ChannelContextInitException(e);
-        }
+    public void addMessageHandlerLast(ChannelHandler<C> channelHandler) {
+        this.channelHandlerList.add(channelHandler);
+    }
+
+    public void addMessageHandlerFirst(ChannelHandler<C> channelHandler) {
+        this.channelHandlerList.add(0, channelHandler);
     }
 
     public void invokeChannelReady() {
-        this.channelActiveIt = channelHandlerList.iterator();
+        this.channelReadyIt = channelHandlerList.iterator();
         this.invokeNextChannelReady();
     }
 
     public void invokeNextChannelReady() {
         try {
-            messageReadIt.next().active(this);
-        } catch (Exception e) {
-            throw new MessageHandlerExecuteException(e);
+            channelReadyIt.next().ready(this);
+        } catch (Throwable t) {
+            invokeNextChannelError(t);
         }
-    }
-
-    public void addMessageHandler(ChannelHandler channelHandler) {
-        this.channelHandlerList.add(channelHandler);
-    }
-
-    public void addMessageHandler(Collection<ChannelHandler> channelHandlerCollection) {
-        this.channelHandlerList.addAll(channelHandlerCollection);
     }
 
     public void invokeChannelRead(Object msg) {
@@ -107,8 +56,8 @@ public class ChannelContext {
     public void invokeNextChannelRead(Object msg) {
         try {
             messageReadIt.next().read(this, msg);
-        } catch (Exception e) {
-            throw new MessageHandlerExecuteException(e);
+        } catch (Throwable t) {
+            invokeNextChannelError(t);
         }
     }
 
@@ -120,11 +69,25 @@ public class ChannelContext {
     public void invokeNextChannelWrite(Object msg) {
         try {
             messageWriteIt.next().write(this, msg);
-            long now = System.currentTimeMillis();
-            this.lastWriteTime = now;
-            this.lastRwTime = now;
-        } catch (Exception e) {
-            throw new MessageHandlerExecuteException(e);
+        } catch (Throwable t) {
+            invokeNextChannelError(t);
         }
+    }
+
+    public void invokeChannelError(Throwable t) {
+        this.messageReadIt = channelHandlerList.iterator();
+        this.invokeNextChannelError(t);
+    }
+
+    public void invokeNextChannelError(Throwable t) {
+        try {
+            messageReadIt.next().error(this, t);
+        } catch (Throwable subThrowable) {
+            invokeNextChannelError(subThrowable);
+        }
+    }
+
+    public ChannelContext(C channel) {
+        this.channel = channel;
     }
 }

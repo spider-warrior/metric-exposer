@@ -2,9 +2,6 @@ package cn.t.metric.server;
 
 import cn.t.metric.common.constants.ChannelAttrName;
 import cn.t.metric.common.context.ChannelContext;
-import cn.t.metric.common.context.ChannelContextManager;
-import cn.t.metric.common.handler.impl.HeadChannelHandler;
-import cn.t.metric.common.handler.impl.ServerMessageHandler;
 import cn.t.metric.common.repository.SystemInfoRepository;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.MsgDecoder;
@@ -28,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 public class MetricExposerServer {
     private final int bindPrt;
     private final String bingAddress;
-    private final ChannelContextManager manager;
     private final SystemInfoRepository systemInfoRepository;
     private final long examinePeriod = TimeUnit.SECONDS.toMillis(3);
     private Selector openedSelector;
@@ -59,14 +55,12 @@ public class MetricExposerServer {
                 long now = System.currentTimeMillis();
                 if(now > nextExamineTime) {
                     nextExamineTime = now + examinePeriod;
-                    manager.examineExpiredChannelContext();
                 }
             }
         } catch (Exception e) {
             throw new MetricExposerServerException(e);
         } finally {
             status = MetricExposerServerStatus.STOPPED;
-            manager.closeAllChannelContext();
         }
     }
 
@@ -79,7 +73,6 @@ public class MetricExposerServer {
                 handleEvent(key);
             } catch (Exception e) {
                 System.out.printf("异常类型：%s, 详情: %s%n", e.getClass().getSimpleName(), e.getMessage());
-                manager.clearChannelContext(ChannelUtil.getChannelContext(key));
                 ChannelUtil.closeChannel(key);
             }
         }
@@ -103,15 +96,9 @@ public class MetricExposerServer {
         socketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, false);
         socketChannel.setOption(StandardSocketOptions.TCP_NODELAY, false);
         ChannelContext channelContext = new ChannelContext(socketChannel);
-        long now = System.currentTimeMillis();
-        channelContext.setLastReadTime(now);
-        channelContext.setLastRwTime(now);
         Map<String, Object> attrs = new HashMap<>();
         attrs.put(ChannelAttrName.attrChannelContext, channelContext);
         socketChannel.register(key.selector(), SelectionKey.OP_READ, attrs);
-        //添加消息处理器
-        channelContext.addMessageHandler(new HeadChannelHandler(ServerMessageHandler.bizMessageHandlerList(systemInfoRepository)));
-        manager.add(channelContext);
     }
 
     private void handleReadEvent(SelectionKey key) throws IOException {
@@ -123,10 +110,6 @@ public class MetricExposerServer {
             //convert to read mode
             readBuffer.flip();
             ChannelContext channelContext = ChannelUtil.getChannelContext(key);
-            long now = System.currentTimeMillis();
-            channelContext.setLastReadTime(now);
-            channelContext.setLastRwTime(now);
-            manager.modify(channelContext);
             while (true){
                 Object message = MsgDecoder.decode(readBuffer);
                 if(message == null) {
@@ -155,10 +138,9 @@ public class MetricExposerServer {
         return status;
     }
 
-    public MetricExposerServer(int bindPrt, String bingAddress, ChannelContextManager manager, SystemInfoRepository systemInfoRepository) {
+    public MetricExposerServer(int bindPrt, String bingAddress, SystemInfoRepository systemInfoRepository) {
         this.bindPrt = bindPrt;
         this.bingAddress = bingAddress;
-        this.manager = manager;
         this.systemInfoRepository = systemInfoRepository;
         this.status = MetricExposerServerStatus.INIT;
     }

@@ -2,7 +2,9 @@ package cn.t.metric.common.handler;
 
 import cn.t.metric.common.repository.SystemInfoRepository;
 
-public abstract class AbstractChannelHandler implements ChannelHandler {
+import java.nio.channels.SocketChannel;
+
+public abstract class AbstractChannelHandler implements ChannelHandler<SocketChannel> {
     protected final SystemInfoRepository systemInfoRepository;
 
     public AbstractChannelHandler(SystemInfoRepository systemInfoRepository) {

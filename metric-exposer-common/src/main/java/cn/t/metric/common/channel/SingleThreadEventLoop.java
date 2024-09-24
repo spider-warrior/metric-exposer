@@ -1,20 +1,21 @@
 package cn.t.metric.common.channel;
 
 import cn.t.metric.common.constants.EventLoopStatus;
-import cn.t.metric.common.context.ChannelContext;
-import cn.t.metric.common.exception.SelectorOpenException;
+import cn.t.metric.common.util.ChannelUtil;
+import cn.t.metric.common.util.ExceptionUtil;
 
+import java.io.Closeable;
 import java.io.IOException;
+import java.nio.channels.ClosedChannelException;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
 
-public class SingleThreadEventLoop implements Runnable {
+public class SingleThreadEventLoop implements Runnable, Closeable {
 
     private volatile EventLoopStatus status = EventLoopStatus.NOT_STARTED;
-    private volatile Throwable error;
     private final Selector selector;
-    private final ChannelContext channelContext;
 
     @Override
     public void run() {
@@ -27,36 +28,32 @@ public class SingleThreadEventLoop implements Runnable {
                     while (it.hasNext()) {
                         SelectionKey key = it.next();
                         it.remove();
-                        channelContext.invokeChannelRead(key);
+                        try {
+                            ChannelUtil.getChannelContext(key).invokeChannelRead(key);
+                        } catch (Throwable t) {
+                            ChannelUtil.getChannelContext(key).invokeChannelError(t);
+                        }
                     }
                 }
             }
         } catch (Throwable t) {
-            error = t;
+            System.out.println(ExceptionUtil.getErrorMessage(t));
         } finally {
-            release();
-            status = EventLoopStatus.SHUTDOWN;
+            try { this.selector.close(); } catch (Throwable t) {System.out.println(ExceptionUtil.getErrorMessage(t));}
+            this.status = EventLoopStatus.SHUTDOWN;
         }
     }
 
-    public void shutdown() {
-        status = EventLoopStatus.SHUTTING_DOWN;
+    @Override
+    public void close() {
+        this.status = EventLoopStatus.SHUTTING_DOWN;
     }
 
-    public void release() {
-        try { this.selector.close();} catch (IOException ignore) {}
+    public final SelectionKey register(SelectableChannel selectableChannel, int ops, Object attr) throws ClosedChannelException {
+        return selectableChannel.register(this.selector, ops, attr);
     }
 
-    public Throwable getError() {
-        return error;
-    }
-
-    public SingleThreadEventLoop(ChannelContext channelContext) {
-        try {
-            this.selector = Selector.open();
-        } catch (IOException e) {
-            throw new SelectorOpenException(e);
-        }
-        this.channelContext = channelContext;
+    public SingleThreadEventLoop() throws IOException {
+        this.selector = Selector.open();
     }
 }
