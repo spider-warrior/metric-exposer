@@ -13,7 +13,7 @@ import java.nio.channels.SocketChannel;
 public class MetricExposerServerApplication {
     public static void main(String[] args) throws IOException {
         int bindPrt = 5000;
-        String bingAddress = "127.0.0.1";
+        String bindAddress = "127.0.0.1";
         SystemInfoRepository systemInfoRepository  = new SystemInfoRepository();
         ChannelInitializer<SocketChannel> channelInitializer = new ChannelInitializer<SocketChannel>() {
             @Override
@@ -34,6 +34,6 @@ public class MetricExposerServerApplication {
                 channelContext.addMessageHandlerFirst(new HeartBeatChannelHandler(systemInfoRepository));
             }
         };
-        ServerBootstrap.bind(bingAddress, bindPrt, channelInitializer, new SingleThreadEventLoop(), new SingleThreadEventLoop());
+        ServerBootstrap.bind(bindAddress, bindPrt, channelInitializer, new SingleThreadEventLoop(), new SingleThreadEventLoop());
     }
 }

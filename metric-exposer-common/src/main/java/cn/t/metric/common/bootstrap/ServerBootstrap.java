@@ -14,16 +14,18 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 public class ServerBootstrap {
-    public static void bind(String bingAddress, int bindPrt, ChannelInitializer<SocketChannel> channelInitializer, SingleThreadEventLoop acceptLoop, SingleThreadEventLoop workerLoop) {
+    public static void bind(String bindAddress, int bindPrt, ChannelInitializer<SocketChannel> channelInitializer, SingleThreadEventLoop acceptLoop, SingleThreadEventLoop workerLoop) {
         try (
                 ServerSocketChannel serverSocketChannel = ServerSocketChannel.open()
         ) {
             // 绑定&监听
             serverSocketChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
             serverSocketChannel.configureBlocking(false);
-            serverSocketChannel.socket().bind(new InetSocketAddress(bingAddress, bindPrt), 128);
+            serverSocketChannel.socket().bind(new InetSocketAddress(bindAddress, bindPrt), 128);
 
             // 构建serverSocketChannelContext
             ChannelContext<ServerSocketChannel> serverSocketChannelContext = new ChannelContext<>(serverSocketChannel);
@@ -42,6 +44,7 @@ public class ServerBootstrap {
             // 启动accept线程
             new Thread(acceptLoop).start();
 
+            LockSupport.parkNanos(TimeUnit.MINUTES.toNanos(5));
         } catch (Exception e) {
             throw new BootstrapException(e);
         }
