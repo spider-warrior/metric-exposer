@@ -4,7 +4,7 @@ import cn.t.metric.common.bootstrap.ServerBootstrap;
 import cn.t.metric.common.channel.ChannelInitializer;
 import cn.t.metric.common.channel.SingleThreadEventLoop;
 import cn.t.metric.common.context.ChannelContext;
-import cn.t.metric.common.handler.impl.*;
+import cn.t.metric.common.handler.ChannelHandler;
 import cn.t.metric.common.repository.SystemInfoRepository;
 
 import java.nio.channels.SocketChannel;
@@ -17,20 +17,27 @@ public class MetricExposerServerApplication {
         ChannelInitializer<SocketChannel> channelInitializer = new ChannelInitializer<SocketChannel>() {
             @Override
             public void initChannel(ChannelContext<SocketChannel> channelContext, SocketChannel ch) throws Exception {
-                channelContext.addMessageHandlerFirst(new SystemInfoChannelHandler(systemInfoRepository));
-                channelContext.addMessageHandlerFirst(new DiscInfoChannelHandler(systemInfoRepository));
-                channelContext.addMessageHandlerFirst(new NetworkInterfaceInfoChannelHandler(systemInfoRepository));
-                channelContext.addMessageHandlerFirst(new SystemMetricChannelHandler(systemInfoRepository));
-                channelContext.addMessageHandlerFirst(new CpuLoadMetricChannelHandler(systemInfoRepository));
-                channelContext.addMessageHandlerFirst(new DiscMetricChannelHandler(systemInfoRepository));
-                channelContext.addMessageHandlerFirst(new MemoryMetricChannelHandler(systemInfoRepository));
-                channelContext.addMessageHandlerFirst(new NetworkMetricChannelHandler(systemInfoRepository));
-                channelContext.addMessageHandlerFirst(new BatchDiscInfoChannelHandler(systemInfoRepository));
-                channelContext.addMessageHandlerFirst(new BatchNetworkInterfaceInfoChannelHandler(systemInfoRepository));
-                channelContext.addMessageHandlerFirst(new BatchDiscMetricChannelHandler(systemInfoRepository));
-                channelContext.addMessageHandlerFirst(new BatchNetworkMetricChannelHandler(systemInfoRepository));
-                channelContext.addMessageHandlerFirst(new CmdResponseChannelHandler(systemInfoRepository));
-                channelContext.addMessageHandlerFirst(new HeartBeatChannelHandler(systemInfoRepository));
+                channelContext.addMessageHandlerLast(new ChannelHandler<SocketChannel>() {
+                    @Override
+                    public void ready(ChannelContext<SocketChannel> ctx) throws Exception {
+                        System.out.println("new connection: " + ch.getRemoteAddress());
+                    }
+
+                    @Override
+                    public void read(ChannelContext<SocketChannel> channelContext, Object msg) throws Exception {
+                        System.out.println("read message: " + msg);
+                    }
+
+                    @Override
+                    public void write(ChannelContext<SocketChannel> channelContext, Object msg) throws Exception {
+                        System.out.println("write message: " + msg);
+                    }
+
+                    @Override
+                    public void error(ChannelContext<SocketChannel> ctx, Throwable t) throws Exception {
+                        System.out.println("error: " + t);
+                    }
+                });
             }
         };
         ServerBootstrap.bind(bindAddress, bindPrt, channelInitializer, new SingleThreadEventLoop(), new SingleThreadEventLoop());

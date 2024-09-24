@@ -24,7 +24,7 @@ public class ClientBootstrap {
         ChannelContext<SocketChannel> channelContext = new ChannelContext<>(socketChannel);
         channelInitializer.initChannel(channelContext, socketChannel);
 
-        // 监听就绪
+        // 连接就绪
         channelContext.invokeChannelReady();
 
         // 注册read事件

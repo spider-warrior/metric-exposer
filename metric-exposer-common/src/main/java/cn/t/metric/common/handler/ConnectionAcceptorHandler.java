@@ -29,8 +29,10 @@ public class ConnectionAcceptorHandler implements ChannelHandler<ServerSocketCha
         attrs.put(ChannelAttrName.attrChannelContext, channelContext);
         //初始化channel
         channelInitializer.initChannel(channelContext, socketChannel);
-        //注册读写事件
+        //注册读事件
         workerLoop.register(socketChannel, SelectionKey.OP_READ, attrs);
+        // 连接就绪
+        channelContext.invokeChannelReady();
     }
 
     @Override
