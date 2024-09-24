@@ -16,26 +16,26 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 public class ClientBootstrap {
-    public static void connect(String serverHost, int serverPort, ChannelInitializer<SocketChannel> channelInitializer, SingleThreadEventLoop workerLoop) throws Exception {
-
+    public static SocketChannel connect(String serverHost, int serverPort, ChannelInitializer<SocketChannel> channelInitializer, SingleThreadEventLoop workerLoop) throws Exception {
         // 连接
-        try(SocketChannel socketChannel = connect(serverHost, serverPort)) {
+        SocketChannel socketChannel = connect(serverHost, serverPort);
 
-            // 构建channelContext
-            ChannelContext<SocketChannel> channelContext = new ChannelContext<>(socketChannel);
-            channelInitializer.initChannel(channelContext, socketChannel);
+        // 构建channelContext
+        ChannelContext<SocketChannel> channelContext = new ChannelContext<>(socketChannel);
+        channelInitializer.initChannel(channelContext, socketChannel);
 
-            // 监听就绪
-            channelContext.invokeChannelReady();
+        // 监听就绪
+        channelContext.invokeChannelReady();
 
-            // 注册read事件
-            Map<String, Object> attrs = new HashMap<>();
-            attrs.put(ChannelAttrName.attrChannelContext, channelContext);
-            workerLoop.register(socketChannel, SelectionKey.OP_READ, attrs);
+        // 注册read事件
+        Map<String, Object> attrs = new HashMap<>();
+        attrs.put(ChannelAttrName.attrChannelContext, channelContext);
+        workerLoop.register(socketChannel, SelectionKey.OP_READ, attrs);
 
-            // 启动worker线程
-            new Thread(workerLoop).start();
-        }
+        // 启动worker线程
+        new Thread(workerLoop).start();
+
+        return socketChannel;
     }
     private static SocketChannel connect(String ip, int port) throws IOException {
         SocketChannel socketChannel = SocketChannel.open();

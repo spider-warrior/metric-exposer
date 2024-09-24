@@ -7,11 +7,10 @@ import cn.t.metric.common.context.ChannelContext;
 import cn.t.metric.common.handler.impl.*;
 import cn.t.metric.common.repository.SystemInfoRepository;
 
-import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
 public class MetricExposerServerApplication {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         int bindPrt = 5000;
         String bindAddress = "127.0.0.1";
         SystemInfoRepository systemInfoRepository  = new SystemInfoRepository();
