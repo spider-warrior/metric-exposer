@@ -35,9 +35,9 @@ public class ServerBootstrap {
         acceptLoop.register(serverSocketChannel, SelectionKey.OP_ACCEPT, attrs);
 
         // 启动worker线程
-        new Thread(workerLoop).start();
+        new Thread(workerLoop, "worker-thread").start();
         // 启动accept线程
-        new Thread(acceptLoop).start();
+        new Thread(acceptLoop, "accept-thread").start();
 
         return serverSocketChannel;
     }

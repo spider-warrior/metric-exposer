@@ -11,14 +11,19 @@ import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class SingleThreadEventLoop implements Runnable, Closeable {
 
+    private final BlockingDeque<Runnable> taskQueue = new LinkedBlockingDeque<>();
     private volatile EventLoopStatus status = EventLoopStatus.NOT_STARTED;
     private final Selector selector;
+    private volatile Thread thread;
 
     @Override
     public void run() {
+        thread = Thread.currentThread();
         status = EventLoopStatus.STARTED;
         try {
             while (status == EventLoopStatus.STARTED) {
@@ -35,6 +40,12 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
                         }
                     }
                 }
+                while(!taskQueue.isEmpty()) {
+                    Runnable runnable = taskQueue.poll();
+                    if(runnable != null) {
+                        runnable.run();
+                    }
+                }
             }
         } catch (Throwable t) {
             System.out.println(ExceptionUtil.getErrorMessage(t));
@@ -49,8 +60,27 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
         this.status = EventLoopStatus.SHUTTING_DOWN;
     }
 
-    public final SelectionKey register(SelectableChannel selectableChannel, int ops, Object attr) throws ClosedChannelException {
-        return selectableChannel.register(this.selector, ops, attr);
+    public boolean inEventLoop(Thread thread) {
+        return thread == this.thread;
+    }
+
+    public final void register(SelectableChannel selectableChannel, int ops, Object attr) throws ClosedChannelException {
+        if(inEventLoop(Thread.currentThread())) {
+            selectableChannel.register(this.selector, ops, attr);
+        } else {
+            addTask(() -> {
+                try {
+                    selectableChannel.register(this.selector, ops, attr);
+                } catch (ClosedChannelException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+    }
+
+    public void addTask(Runnable runnable) {
+        this.taskQueue.add(runnable);
+        this.selector.wakeup();
     }
 
     public SingleThreadEventLoop() throws IOException {
