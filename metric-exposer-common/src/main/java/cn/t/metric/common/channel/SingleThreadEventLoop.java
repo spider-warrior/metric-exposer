@@ -80,6 +80,7 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
 
     public void addTask(Runnable runnable) {
         this.taskQueue.add(runnable);
+        //todo 多线程会调用多次wakeup，且当selector未阻塞在select方法时被调用wakeup方法，那么当selector下次调用select方法时会直接返回。selectNow()可以清理掉之前任何调用wakeup带来的影响。
         this.selector.wakeup();
     }
 
