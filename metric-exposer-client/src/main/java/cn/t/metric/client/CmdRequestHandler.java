@@ -8,7 +8,7 @@ import java.nio.channels.SocketChannel;
 public class CmdRequestHandler implements ChannelHandler<SocketChannel> {
 
     @Override
-    public void read(ChannelContext<SocketChannel> channelContext, Object msg) throws Exception {
+    public void read(ChannelContext<SocketChannel> ctx, Object msg) throws Exception {
 
     }
 }

@@ -14,12 +14,12 @@ public class TailChannelHandler implements ChannelHandler {
     private final SocketChannel socketChannel;
 
     @Override
-    public void read(ChannelContext channelContext, Object msg) {
+    public void read(ChannelContext ctx, Object msg) {
         throw new MessageHandlerExecuteException("未知消息: " + msg);
     }
 
     @Override
-    public void write(ChannelContext channelContext, Object msg) {
+    public void write(ChannelContext ctx, Object msg) {
         try {
             ChannelUtil.write(socketChannel, MsgEncoder.encode(msg));
         } catch (IOException e) {

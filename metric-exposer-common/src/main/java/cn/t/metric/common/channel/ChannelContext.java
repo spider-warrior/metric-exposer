@@ -43,29 +43,6 @@ public class ChannelContext<C extends NetworkChannel> {
         this.attrs.put(name, value);
     }
 
-    public void invokeNextChannelReady() {
-        this.channelPipeline.invokeNextChannelReady();
-    }
-
-    public void invokeNextChannelRead(Object msg) {
-        this.channelPipeline.invokeNextChannelRead(msg);
-    }
-
-
-    public void invokeNextChannelWrite(Object msg) {
-        this.channelPipeline.invokeNextChannelWrite(msg);
-    }
-
-
-    public void invokeNextChannelClose() {
-        this.channelPipeline.invokeNextChannelClose();
-    }
-
-
-    public void invokeNextChannelError(Throwable t) {
-        this.channelPipeline.invokeNextChannelError(t);
-    }
-
     public ChannelPipeline<C> getChannelPipeline() {
         return channelPipeline;
     }

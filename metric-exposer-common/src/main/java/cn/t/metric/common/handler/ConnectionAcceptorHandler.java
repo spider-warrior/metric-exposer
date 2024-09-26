@@ -27,7 +27,7 @@ public class ConnectionAcceptorHandler implements ChannelHandler<ServerSocketCha
         //注册读事件
         workerLoop.register(socketChannel, SelectionKey.OP_READ, channelContext);
         // 连接就绪
-        channelContext.getChannelPipeline().invokeChannelReady();
+        ctx.getChannelPipeline().invokeChannelReady();
     }
 
     @Override

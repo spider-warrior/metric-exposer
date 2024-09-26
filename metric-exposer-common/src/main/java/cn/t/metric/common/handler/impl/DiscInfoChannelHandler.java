@@ -14,14 +14,14 @@ import java.nio.channels.SocketChannel;
 public class DiscInfoChannelHandler extends AbstractChannelHandler {
 
     @Override
-    public void read(ChannelContext<SocketChannel> channelContext, Object msg) throws IOException {
+    public void read(ChannelContext<SocketChannel> ctx, Object msg) throws IOException {
         if(msg instanceof DiscInfo) {
-            SocketChannel socketChannel = channelContext.getChannel();
+            SocketChannel socketChannel = ctx.getChannel();
             InetSocketAddress socketAddress = (InetSocketAddress)socketChannel.getRemoteAddress();
             SystemInfo systemInfo = systemInfoRepository.queryById(socketAddress.getHostString());
             PopulateUtil.populateDiscInfo(systemInfo, (DiscInfo)msg);
         } else {
-            channelContext.invokeNextChannelRead(msg);
+            ctx.getChannelPipeline().invokeNextChannelRead(msg);
         }
     }
 

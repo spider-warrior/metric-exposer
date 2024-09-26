@@ -22,7 +22,7 @@ public class ClientMessageHandler {
 
     private class CmdRequestChannelHandler implements ChannelHandler {
         @Override
-        public void read(ChannelContext channelContext, Object msg) {
+        public void read(ChannelContext ctx, Object msg) {
             if(msg instanceof CmdRequest) {
                 CmdResponse cmdResponse = new CmdResponse();
                 try {
@@ -33,9 +33,9 @@ public class ClientMessageHandler {
                     cmdResponse.setSuccess(false);
                     cmdResponse.setOutput(ExceptionUtil.getErrorMessage(e));
                 }
-                channelContext.getChannelPipeline().invokeChannelWrite(cmdResponse);
+                ctx.getChannelPipeline().invokeChannelWrite(cmdResponse);
             } else {
-                channelContext.invokeNextChannelRead(msg);
+                ctx.getChannelPipeline().invokeNextChannelRead(msg);
             }
         }
     }

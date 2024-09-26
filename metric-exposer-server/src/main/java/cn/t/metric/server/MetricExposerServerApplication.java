@@ -16,20 +16,20 @@ public class MetricExposerServerApplication {
         SystemInfoRepository systemInfoRepository  = new SystemInfoRepository();
         ChannelInitializer<SocketChannel> channelInitializer = new ChannelInitializer<SocketChannel>() {
             @Override
-            public void initChannel(ChannelContext<SocketChannel> channelContext, SocketChannel ch) throws Exception {
-                channelContext.getChannelPipeline().addMessageHandlerLast(new ChannelHandler<SocketChannel>() {
+            public void initChannel(ChannelContext<SocketChannel> ctx, SocketChannel ch) throws Exception {
+                ctx.getChannelPipeline().addMessageHandlerLast(new ChannelHandler<SocketChannel>() {
                     @Override
                     public void ready(ChannelContext<SocketChannel> ctx) throws Exception {
                         System.out.println("new connection: " + ch.getRemoteAddress());
                     }
 
                     @Override
-                    public void read(ChannelContext<SocketChannel> channelContext, Object msg) throws Exception {
+                    public void read(ChannelContext<SocketChannel> ctx, Object msg) throws Exception {
                         System.out.println("read message: " + msg);
                     }
 
                     @Override
-                    public void write(ChannelContext<SocketChannel> channelContext, Object msg) throws Exception {
+                    public void write(ChannelContext<SocketChannel> ctx, Object msg) throws Exception {
                         System.out.println("write message: " + msg);
                     }
 

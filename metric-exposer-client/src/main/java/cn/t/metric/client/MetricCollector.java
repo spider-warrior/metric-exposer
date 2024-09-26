@@ -22,40 +22,40 @@ public class MetricCollector {
     private static final ScheduledExecutorService scheduledExecutorService =  Executors.newScheduledThreadPool(2, new ExposerThreadFactory("exposer-client-"));
     private static final List<ScheduledFuture<?>> scheduledFutureListList = new ArrayList<>(4);
 
-    public void startTask(ChannelContext<SocketChannel> channelContext) {
+    public void startTask(ChannelContext<SocketChannel> ctx) {
         SystemInfo systemInfo = MetricCollectUtil.collectSystemInfo();
-        if(channelContext.getChannel().isOpen() && channelContext.getChannel().isConnected()) {
-            channelContext.getChannelPipeline().invokeChannelWrite(systemInfo);
+        if(ctx.getChannel().isOpen() && ctx.getChannel().isConnected()) {
+            ctx.getChannelPipeline().invokeChannelWrite(systemInfo);
         }
         //cpu采集
         ScheduledFuture<?> cpuTaskFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
             CpuLoadMetric message = MetricCollectUtil.collectCpuMetric();
-            if(channelContext.getChannel().isOpen() && channelContext.getChannel().isConnected()) {
-                channelContext.getChannelPipeline().invokeChannelWrite(message);
+            if(ctx.getChannel().isOpen() && ctx.getChannel().isConnected()) {
+                ctx.getChannelPipeline().invokeChannelWrite(message);
             }
         }, 0, 5, TimeUnit.SECONDS);
         scheduledFutureListList.add(cpuTaskFuture);
         //内存采集
         ScheduledFuture<?> memoryTaskFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
             MemoryMetric message = MetricCollectUtil.collectMemoryMetric();
-            if(channelContext.getChannel().isOpen() && channelContext.getChannel().isConnected()) {
-                channelContext.getChannelPipeline().invokeChannelWrite(message);
+            if(ctx.getChannel().isOpen() && ctx.getChannel().isConnected()) {
+                ctx.getChannelPipeline().invokeChannelWrite(message);
             }
         }, 0, 5, TimeUnit.SECONDS);
         scheduledFutureListList.add(memoryTaskFuture);
         //network采集
         ScheduledFuture<?> networkTaskFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
             BatchNetworkMetric message = MetricCollectUtil.collectBatchMetric();
-            if(channelContext.getChannel().isOpen() && channelContext.getChannel().isConnected()) {
-                channelContext.getChannelPipeline().invokeChannelWrite(message);
+            if(ctx.getChannel().isOpen() && ctx.getChannel().isConnected()) {
+                ctx.getChannelPipeline().invokeChannelWrite(message);
             }
         }, 0, 5, TimeUnit.SECONDS);
         scheduledFutureListList.add(networkTaskFuture);
         //磁盘采集
         ScheduledFuture<?> discTaskFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
             BatchDiscMetric message = MetricCollectUtil.collectBatchDiscMetric();
-            if(channelContext.getChannel().isOpen() && channelContext.getChannel().isConnected()) {
-                channelContext.getChannelPipeline().invokeChannelWrite(message);
+            if(ctx.getChannel().isOpen() && ctx.getChannel().isConnected()) {
+                ctx.getChannelPipeline().invokeChannelWrite(message);
             }
         }, 0, 20, TimeUnit.SECONDS);
         scheduledFutureListList.add(discTaskFuture);

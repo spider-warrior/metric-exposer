@@ -20,14 +20,14 @@ public class ServerBootstrap {
         serverSocketChannel.socket().bind(new InetSocketAddress(bindAddress, bindPrt), 128);
 
         // 构建serverSocketChannelContext
-        ChannelContext<ServerSocketChannel> serverSocketChannelContext = new ChannelContext<>(serverSocketChannel);
-        serverSocketChannelContext.getChannelPipeline().addMessageHandlerFirst(new ConnectionAcceptorHandler(channelInitializer, workerLoop));
+        ChannelContext<ServerSocketChannel> serverSocketCtx = new ChannelContext<>(serverSocketChannel);
+        serverSocketCtx.getChannelPipeline().addMessageHandlerFirst(new ConnectionAcceptorHandler(channelInitializer, workerLoop));
 
         // 监听就绪
-        serverSocketChannelContext.getChannelPipeline().invokeChannelReady();
+        serverSocketCtx.getChannelPipeline().invokeChannelReady();
 
         // 注册accept事件
-        acceptLoop.register(serverSocketChannel, SelectionKey.OP_ACCEPT, serverSocketChannelContext);
+        acceptLoop.register(serverSocketChannel, SelectionKey.OP_ACCEPT, serverSocketCtx);
 
         // 启动worker线程
         new Thread(workerLoop, "worker-thread").start();

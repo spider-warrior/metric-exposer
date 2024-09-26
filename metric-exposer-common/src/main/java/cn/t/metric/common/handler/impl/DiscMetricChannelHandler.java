@@ -14,10 +14,10 @@ import java.util.List;
 
 public class DiscMetricChannelHandler extends AbstractChannelHandler {
     @Override
-    public void read(ChannelContext<SocketChannel> channelContext, Object msg) throws IOException {
+    public void read(ChannelContext<SocketChannel> ctx, Object msg) throws IOException {
         if(msg instanceof DiscMetric) {
             DiscMetric discMetric = (DiscMetric)msg;
-            SocketChannel socketChannel = channelContext.getChannel();
+            SocketChannel socketChannel = ctx.getChannel();
             InetSocketAddress socketAddress = (InetSocketAddress)socketChannel.getRemoteAddress();
             SystemInfo systemInfo = systemInfoRepository.queryById(socketAddress.getHostString());
             List<DiscInfo> discInfoList = systemInfo.getDiscInfoList();
@@ -28,7 +28,7 @@ public class DiscMetricChannelHandler extends AbstractChannelHandler {
                 }
             }
         } else {
-            channelContext.invokeNextChannelRead(msg);
+            ctx.getChannelPipeline().invokeNextChannelRead(msg);
         }
     }
     public DiscMetricChannelHandler(SystemInfoRepository systemInfoRepository) {

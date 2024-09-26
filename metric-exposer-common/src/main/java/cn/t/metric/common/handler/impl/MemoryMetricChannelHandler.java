@@ -12,15 +12,15 @@ import java.nio.channels.SocketChannel;
 
 public class MemoryMetricChannelHandler extends AbstractChannelHandler {
     @Override
-    public void read(ChannelContext<SocketChannel> channelContext, Object msg) throws IOException {
+    public void read(ChannelContext<SocketChannel> ctx, Object msg) throws IOException {
         if(msg instanceof MemoryMetric) {
-            SocketChannel socketChannel = channelContext.getChannel();
+            SocketChannel socketChannel = ctx.getChannel();
             InetSocketAddress socketAddress = (InetSocketAddress)socketChannel.getRemoteAddress();
             SystemInfo systemInfo = systemInfoRepository.queryById(socketAddress.getHostString());
             systemInfo.setFreePhysicalMemorySize(((MemoryMetric)msg).getPhysicalMemoryFree());
             systemInfo.setFreeSwapSize(((MemoryMetric)msg).getSwapMemoryFree());
         } else {
-            channelContext.invokeNextChannelRead(msg);
+            ctx.getChannelPipeline().invokeNextChannelRead(msg);
         }
     }
     public MemoryMetricChannelHandler(SystemInfoRepository systemInfoRepository) {

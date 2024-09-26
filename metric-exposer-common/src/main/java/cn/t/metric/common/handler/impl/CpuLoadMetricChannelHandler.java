@@ -13,15 +13,15 @@ import java.nio.channels.SocketChannel;
 public class CpuLoadMetricChannelHandler extends AbstractChannelHandler {
 
     @Override
-    public void read(ChannelContext<SocketChannel> channelContext, Object msg) throws IOException {
+    public void read(ChannelContext<SocketChannel> ctx, Object msg) throws IOException {
         if(msg instanceof CpuLoadMetric) {
-            SocketChannel socketChannel = channelContext.getChannel();
+            SocketChannel socketChannel = ctx.getChannel();
             InetSocketAddress socketAddress = (InetSocketAddress)socketChannel.getRemoteAddress();
             SystemInfo systemInfo = systemInfoRepository.queryById(socketAddress.getHostString());
             systemInfo.setSystemCpuLoad(((CpuLoadMetric)msg).getSystemCpuLoad());
             systemInfo.setSystemCpuLoadAverage(((CpuLoadMetric)msg).getSystemCpuLoadAverage());
         } else {
-            channelContext.invokeNextChannelRead(msg);
+            ctx.getChannelPipeline().invokeNextChannelRead(msg);
         }
     }
 

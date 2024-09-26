@@ -9,7 +9,7 @@ public interface ChannelHandler<C extends NetworkChannel> {
     default void ready(ChannelContext<C> ctx) throws Exception {}
     void read(ChannelContext<C> channelContext, Object msg) throws Exception;
     default void write(ChannelContext<C> ctx, Object msg) throws Exception {
-        ctx.invokeNextChannelWrite(msg);
+        ctx.getChannelPipeline().invokeNextChannelWrite(msg);
     }
     default void close(ChannelContext<C> ctx) throws Exception {}
     default void error(ChannelContext<C> ctx, Throwable t) throws Exception {

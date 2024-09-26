@@ -104,13 +104,13 @@ public class MetricExposerServer {
         if(length > 0) {
             //convert to read mode
             readBuffer.flip();
-            ChannelContext channelContext = ChannelUtil.getChannelContext(key);
+            ChannelContext ctx = ChannelUtil.getChannelContext(key);
             while (true){
                 Object message = MsgDecoder.decode(readBuffer);
                 if(message == null) {
                     break;
                 } else {
-                    channelContext.getChannelPipeline().invokeChannelRead(message);
+                    ctx.getChannelPipeline().invokeChannelRead(message);
                 }
             }
             //convert to write mode

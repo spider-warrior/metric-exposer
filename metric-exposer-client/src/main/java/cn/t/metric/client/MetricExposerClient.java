@@ -24,7 +24,7 @@ public class MetricExposerClient {
     private final String serverHost;
     private final int serverPort;
 
-    private ChannelContext channelContext;
+    private ChannelContext ctx;
     private MetricExposerClientStatus status;
     private boolean loopRead = true;
 
@@ -34,12 +34,12 @@ public class MetricExposerClient {
             while (loopRead) {
                 try(SocketChannel socketChannel = connect(serverHost, serverPort)) {
                     status = MetricExposerClientStatus.STARTED;
-                    channelContext = new ChannelContext(socketChannel);
+                    ctx = new ChannelContext(socketChannel);
 //                    channelContext.addMessageHandlerLast(ClientMessageHandler.handlerList());
                     //注册读取事件监听
                     socketChannel.register(selector, SelectionKey.OP_READ, new HashMap<>());
                     // 开启采集metric任务
-                    metricCollector.startTask(channelContext);
+                    metricCollector.startTask(ctx);
                     // 循环读取消息
                     while (loopRead) {
                         int count = selector.select(3000);
@@ -97,7 +97,7 @@ public class MetricExposerClient {
                 if(msg == null) {
                     break;
                 } else {
-                    channelContext.getChannelPipeline().invokeChannelRead(msg);
+                    ctx.getChannelPipeline().invokeChannelRead(msg);
                 }
             }
             //convert to write mode

@@ -18,14 +18,14 @@ public class ClientBootstrap {
         SocketChannel socketChannel = connect(serverHost, serverPort);
 
         // 构建channelContext
-        ChannelContext<SocketChannel> channelContext = new ChannelContext<>(socketChannel);
-        channelInitializer.initChannel(channelContext, socketChannel);
+        ChannelContext<SocketChannel> ctx = new ChannelContext<>(socketChannel);
+        channelInitializer.initChannel(ctx, socketChannel);
 
         // 连接就绪
-        channelContext.getChannelPipeline().invokeChannelReady();
+        ctx.getChannelPipeline().invokeChannelReady();
 
         // 注册read事件
-        workerLoop.register(socketChannel, SelectionKey.OP_READ, channelContext);
+        workerLoop.register(socketChannel, SelectionKey.OP_READ, ctx);
 
         // 启动worker线程
         new Thread(workerLoop).start();
