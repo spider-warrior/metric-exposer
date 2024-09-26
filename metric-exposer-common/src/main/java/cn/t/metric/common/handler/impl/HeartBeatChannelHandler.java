@@ -1,6 +1,6 @@
 package cn.t.metric.common.handler.impl;
 
-import cn.t.metric.common.context.ChannelContext;
+import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.handler.AbstractChannelHandler;
 import cn.t.metric.common.message.HeartBeat;
 import cn.t.metric.common.repository.SystemInfoRepository;

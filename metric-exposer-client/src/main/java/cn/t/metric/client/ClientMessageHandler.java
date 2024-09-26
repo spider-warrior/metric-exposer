@@ -1,6 +1,6 @@
 package cn.t.metric.client;
 
-import cn.t.metric.common.context.ChannelContext;
+import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.handler.ChannelHandler;
 import cn.t.metric.common.message.request.CmdRequest;
 import cn.t.metric.common.message.response.CmdResponse;
@@ -33,7 +33,7 @@ public class ClientMessageHandler {
                     cmdResponse.setSuccess(false);
                     cmdResponse.setOutput(ExceptionUtil.getErrorMessage(e));
                 }
-                channelContext.invokeChannelWrite(cmdResponse);
+                channelContext.getChannelPipeline().invokeChannelWrite(cmdResponse);
             } else {
                 channelContext.invokeNextChannelRead(msg);
             }

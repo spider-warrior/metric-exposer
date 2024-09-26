@@ -2,7 +2,7 @@
 package cn.t.metric.common.util;
 
 
-import cn.t.metric.common.context.ChannelContext;
+import cn.t.metric.common.channel.ChannelContext;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

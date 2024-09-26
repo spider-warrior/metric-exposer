@@ -1,32 +1,20 @@
-package cn.t.metric.common.context;
+package cn.t.metric.common.channel;
 
 import cn.t.metric.common.handler.ChannelHandler;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.NetworkChannel;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-public class ChannelContext<C extends NetworkChannel> {
-
-    private final C channel;
+public class ChannelPipeline<C extends NetworkChannel> {
     private final List<ChannelHandler<C>> channelHandlerList = new ArrayList<>();
-    private final Map<String, Object> attrs = new HashMap<>();
+    private final ChannelContext<C> ctx;
+
     private Iterator<ChannelHandler<C>> channelReadyIt;
     private Iterator<ChannelHandler<C>> channelReadIt;
     private Iterator<ChannelHandler<C>> channelWriteIt;
     private Iterator<ChannelHandler<C>> channelCloseIt;
-    private ByteBuffer byteBuffer;
-
-    public C getChannel() {
-        return channel;
-    }
-
-    public void close() {
-        if(this.channel.isOpen()) {
-            try { this.channel.close(); } catch (IOException ignore) {}
-        }
-    }
 
     public void addMessageHandlerLast(ChannelHandler<C> channelHandler) {
         this.channelHandlerList.add(channelHandler);
@@ -43,7 +31,7 @@ public class ChannelContext<C extends NetworkChannel> {
 
     public void invokeNextChannelReady() {
         try {
-            channelReadyIt.next().ready(this);
+            channelReadyIt.next().ready(this.ctx);
         } catch (Throwable t) {
             invokeNextChannelError(t);
         }
@@ -56,7 +44,7 @@ public class ChannelContext<C extends NetworkChannel> {
 
     public void invokeNextChannelRead(Object msg) {
         try {
-            this.channelReadIt.next().read(this, msg);
+            this.channelReadIt.next().read(this.ctx, msg);
         } catch (Throwable t) {
             invokeNextChannelError(t);
         }
@@ -69,7 +57,7 @@ public class ChannelContext<C extends NetworkChannel> {
 
     public void invokeNextChannelWrite(Object msg) {
         try {
-            this.channelWriteIt.next().write(this, msg);
+            this.channelWriteIt.next().write(this.ctx, msg);
         } catch (Throwable t) {
             invokeNextChannelError(t);
         }
@@ -82,9 +70,9 @@ public class ChannelContext<C extends NetworkChannel> {
 
     public void invokeNextChannelClose() {
         try {
-            this.channelCloseIt.next().close(this);
-        } catch (Throwable subThrowable) {
-            invokeNextChannelError(subThrowable);
+            this.channelCloseIt.next().close(this.ctx);
+        } catch (Throwable t) {
+            invokeNextChannelError(t);
         }
     }
 
@@ -95,29 +83,13 @@ public class ChannelContext<C extends NetworkChannel> {
 
     public void invokeNextChannelError(Throwable t) {
         try {
-            this.channelReadIt.next().error(this, t);
+            this.channelReadIt.next().error(this.ctx, t);
         } catch (Throwable subThrowable) {
-            invokeNextChannelError(subThrowable);
+            invokeNextChannelError(t);
         }
     }
 
-    public ByteBuffer getByteBuffer() {
-        return byteBuffer;
-    }
-
-    public void setByteBuffer(ByteBuffer byteBuffer) {
-        this.byteBuffer = byteBuffer;
-    }
-
-    public Object getAttribute(String name) {
-        return this.attrs.get(name);
-    }
-
-    public void setAttribute(String name, Object value) {
-        this.attrs.put(name, value);
-    }
-
-    public ChannelContext(C channel) {
-        this.channel = channel;
+    public ChannelPipeline(ChannelContext<C> ctx) {
+        this.ctx = ctx;
     }
 }

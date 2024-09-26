@@ -1,8 +1,8 @@
 package cn.t.metric.common.bootstrap;
 
+import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.channel.ChannelInitializer;
 import cn.t.metric.common.channel.SingleThreadEventLoop;
-import cn.t.metric.common.context.ChannelContext;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -22,7 +22,7 @@ public class ClientBootstrap {
         channelInitializer.initChannel(channelContext, socketChannel);
 
         // 连接就绪
-        channelContext.invokeChannelReady();
+        channelContext.getChannelPipeline().invokeChannelReady();
 
         // 注册read事件
         workerLoop.register(socketChannel, SelectionKey.OP_READ, channelContext);

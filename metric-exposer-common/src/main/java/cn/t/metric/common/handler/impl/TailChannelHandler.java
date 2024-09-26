@@ -1,6 +1,6 @@
 package cn.t.metric.common.handler.impl;
 
-import cn.t.metric.common.context.ChannelContext;
+import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.exception.MessageHandlerExecuteException;
 import cn.t.metric.common.handler.ChannelHandler;
 import cn.t.metric.common.util.ChannelUtil;

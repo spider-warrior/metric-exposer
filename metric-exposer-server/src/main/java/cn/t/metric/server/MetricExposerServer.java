@@ -1,6 +1,6 @@
 package cn.t.metric.server;
 
-import cn.t.metric.common.context.ChannelContext;
+import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.repository.SystemInfoRepository;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.MsgDecoder;
@@ -110,7 +110,7 @@ public class MetricExposerServer {
                 if(message == null) {
                     break;
                 } else {
-                    channelContext.invokeChannelRead(message);
+                    channelContext.getChannelPipeline().invokeChannelRead(message);
                 }
             }
             //convert to write mode

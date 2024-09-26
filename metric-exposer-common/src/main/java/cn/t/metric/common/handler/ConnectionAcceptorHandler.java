@@ -2,7 +2,7 @@ package cn.t.metric.common.handler;
 
 import cn.t.metric.common.channel.ChannelInitializer;
 import cn.t.metric.common.channel.SingleThreadEventLoop;
-import cn.t.metric.common.context.ChannelContext;
+import cn.t.metric.common.channel.ChannelContext;
 
 import java.net.StandardSocketOptions;
 import java.nio.channels.SelectionKey;
@@ -27,7 +27,7 @@ public class ConnectionAcceptorHandler implements ChannelHandler<ServerSocketCha
         //注册读事件
         workerLoop.register(socketChannel, SelectionKey.OP_READ, channelContext);
         // 连接就绪
-        channelContext.invokeChannelReady();
+        channelContext.getChannelPipeline().invokeChannelReady();
     }
 
     @Override

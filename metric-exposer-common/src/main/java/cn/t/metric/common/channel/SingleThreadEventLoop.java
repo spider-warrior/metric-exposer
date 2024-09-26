@@ -1,7 +1,6 @@
 package cn.t.metric.common.channel;
 
 import cn.t.metric.common.constants.EventLoopStatus;
-import cn.t.metric.common.context.ChannelContext;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.ExceptionUtil;
 
@@ -33,17 +32,17 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
                         it.remove();
                         if(key.isValid()) {
                             if (key.isConnectable()) {
-                                ChannelUtil.getChannelContext(key).invokeChannelReady();
+                                ChannelUtil.getChannelContext(key).getChannelPipeline().invokeChannelReady();
                             }
                             if(key.isWritable()) {
                                 //todo 连接可写
                             }
                             if(key.isReadable() || key.isAcceptable()) {
-                                ChannelUtil.getChannelContext(key).invokeChannelRead(key);
+                                ChannelUtil.getChannelContext(key).getChannelPipeline().invokeChannelRead(key);
                             }
                         } else {
                             // 连接关闭
-                            ChannelUtil.getChannelContext(key).invokeChannelClose();
+                            ChannelUtil.getChannelContext(key).getChannelPipeline().invokeChannelClose();
                         }
                     }
                 }

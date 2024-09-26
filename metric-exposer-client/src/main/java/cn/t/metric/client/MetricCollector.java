@@ -2,7 +2,7 @@ package cn.t.metric.client;
 
 import cn.t.metric.client.thread.ExposerThreadFactory;
 import cn.t.metric.client.util.MetricCollectUtil;
-import cn.t.metric.common.context.ChannelContext;
+import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.message.infos.SystemInfo;
 import cn.t.metric.common.message.metrics.CpuLoadMetric;
 import cn.t.metric.common.message.metrics.MemoryMetric;
@@ -25,13 +25,13 @@ public class MetricCollector {
     public void startTask(ChannelContext<SocketChannel> channelContext) {
         SystemInfo systemInfo = MetricCollectUtil.collectSystemInfo();
         if(channelContext.getChannel().isOpen() && channelContext.getChannel().isConnected()) {
-            channelContext.invokeChannelWrite(systemInfo);
+            channelContext.getChannelPipeline().invokeChannelWrite(systemInfo);
         }
         //cpu采集
         ScheduledFuture<?> cpuTaskFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
             CpuLoadMetric message = MetricCollectUtil.collectCpuMetric();
             if(channelContext.getChannel().isOpen() && channelContext.getChannel().isConnected()) {
-                channelContext.invokeChannelWrite(message);
+                channelContext.getChannelPipeline().invokeChannelWrite(message);
             }
         }, 0, 5, TimeUnit.SECONDS);
         scheduledFutureListList.add(cpuTaskFuture);
@@ -39,7 +39,7 @@ public class MetricCollector {
         ScheduledFuture<?> memoryTaskFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
             MemoryMetric message = MetricCollectUtil.collectMemoryMetric();
             if(channelContext.getChannel().isOpen() && channelContext.getChannel().isConnected()) {
-                channelContext.invokeChannelWrite(message);
+                channelContext.getChannelPipeline().invokeChannelWrite(message);
             }
         }, 0, 5, TimeUnit.SECONDS);
         scheduledFutureListList.add(memoryTaskFuture);
@@ -47,7 +47,7 @@ public class MetricCollector {
         ScheduledFuture<?> networkTaskFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
             BatchNetworkMetric message = MetricCollectUtil.collectBatchMetric();
             if(channelContext.getChannel().isOpen() && channelContext.getChannel().isConnected()) {
-                channelContext.invokeChannelWrite(message);
+                channelContext.getChannelPipeline().invokeChannelWrite(message);
             }
         }, 0, 5, TimeUnit.SECONDS);
         scheduledFutureListList.add(networkTaskFuture);
@@ -55,7 +55,7 @@ public class MetricCollector {
         ScheduledFuture<?> discTaskFuture = scheduledExecutorService.scheduleAtFixedRate(() -> {
             BatchDiscMetric message = MetricCollectUtil.collectBatchDiscMetric();
             if(channelContext.getChannel().isOpen() && channelContext.getChannel().isConnected()) {
-                channelContext.invokeChannelWrite(message);
+                channelContext.getChannelPipeline().invokeChannelWrite(message);
             }
         }, 0, 20, TimeUnit.SECONDS);
         scheduledFutureListList.add(discTaskFuture);

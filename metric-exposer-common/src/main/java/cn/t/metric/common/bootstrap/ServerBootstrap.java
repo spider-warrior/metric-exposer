@@ -2,7 +2,7 @@ package cn.t.metric.common.bootstrap;
 
 import cn.t.metric.common.channel.ChannelInitializer;
 import cn.t.metric.common.channel.SingleThreadEventLoop;
-import cn.t.metric.common.context.ChannelContext;
+import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.handler.ConnectionAcceptorHandler;
 
 import java.net.InetSocketAddress;
@@ -21,10 +21,10 @@ public class ServerBootstrap {
 
         // 构建serverSocketChannelContext
         ChannelContext<ServerSocketChannel> serverSocketChannelContext = new ChannelContext<>(serverSocketChannel);
-        serverSocketChannelContext.addMessageHandlerFirst(new ConnectionAcceptorHandler(channelInitializer, workerLoop));
+        serverSocketChannelContext.getChannelPipeline().addMessageHandlerFirst(new ConnectionAcceptorHandler(channelInitializer, workerLoop));
 
         // 监听就绪
-        serverSocketChannelContext.invokeChannelReady();
+        serverSocketChannelContext.getChannelPipeline().invokeChannelReady();
 
         // 注册accept事件
         acceptLoop.register(serverSocketChannel, SelectionKey.OP_ACCEPT, serverSocketChannelContext);

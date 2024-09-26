@@ -3,7 +3,7 @@ package cn.t.metric.server;
 import cn.t.metric.common.bootstrap.ServerBootstrap;
 import cn.t.metric.common.channel.ChannelInitializer;
 import cn.t.metric.common.channel.SingleThreadEventLoop;
-import cn.t.metric.common.context.ChannelContext;
+import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.handler.ChannelHandler;
 import cn.t.metric.common.repository.SystemInfoRepository;
 
@@ -17,7 +17,7 @@ public class MetricExposerServerApplication {
         ChannelInitializer<SocketChannel> channelInitializer = new ChannelInitializer<SocketChannel>() {
             @Override
             public void initChannel(ChannelContext<SocketChannel> channelContext, SocketChannel ch) throws Exception {
-                channelContext.addMessageHandlerLast(new ChannelHandler<SocketChannel>() {
+                channelContext.getChannelPipeline().addMessageHandlerLast(new ChannelHandler<SocketChannel>() {
                     @Override
                     public void ready(ChannelContext<SocketChannel> ctx) throws Exception {
                         System.out.println("new connection: " + ch.getRemoteAddress());

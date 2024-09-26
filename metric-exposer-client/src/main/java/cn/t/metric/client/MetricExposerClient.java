@@ -2,7 +2,7 @@ package cn.t.metric.client;
 
 import cn.t.metric.client.constants.MetricExposerClientStatus;
 import cn.t.metric.client.exception.MetricExposerClientException;
-import cn.t.metric.common.context.ChannelContext;
+import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.MsgDecoder;
 
@@ -97,8 +97,7 @@ public class MetricExposerClient {
                 if(msg == null) {
                     break;
                 } else {
-                    long now = System.currentTimeMillis();
-                    channelContext.invokeChannelRead(msg);
+                    channelContext.getChannelPipeline().invokeChannelRead(msg);
                 }
             }
             //convert to write mode
