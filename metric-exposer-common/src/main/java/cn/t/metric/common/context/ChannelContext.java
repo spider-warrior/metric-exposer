@@ -3,6 +3,7 @@ package cn.t.metric.common.context;
 import cn.t.metric.common.handler.ChannelHandler;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.NetworkChannel;
 import java.util.*;
 
@@ -15,6 +16,7 @@ public class ChannelContext<C extends NetworkChannel> {
     private Iterator<ChannelHandler<C>> channelReadIt;
     private Iterator<ChannelHandler<C>> channelWriteIt;
     private Iterator<ChannelHandler<C>> channelCloseIt;
+    private ByteBuffer byteBuffer;
 
     public C getChannel() {
         return channel;
@@ -97,6 +99,14 @@ public class ChannelContext<C extends NetworkChannel> {
         } catch (Throwable subThrowable) {
             invokeNextChannelError(subThrowable);
         }
+    }
+
+    public ByteBuffer getByteBuffer() {
+        return byteBuffer;
+    }
+
+    public void setByteBuffer(ByteBuffer byteBuffer) {
+        this.byteBuffer = byteBuffer;
     }
 
     public Object getAttribute(String name) {

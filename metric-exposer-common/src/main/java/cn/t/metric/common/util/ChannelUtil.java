@@ -2,7 +2,6 @@
 package cn.t.metric.common.util;
 
 
-import cn.t.metric.common.constants.ChannelAttrName;
 import cn.t.metric.common.context.ChannelContext;
 
 import java.io.IOException;
@@ -10,17 +9,16 @@ import java.nio.ByteBuffer;
 import java.nio.channels.NetworkChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.Map;
 import java.util.Optional;
 
 public class ChannelUtil {
 
     public static ByteBuffer getChannelBuffer(SelectionKey key) {
-        Map<String, Object> attachment = ChannelUtil.getAttachment(key);
-        ByteBuffer readBuffer = (ByteBuffer)attachment.get(ChannelAttrName.attrAccumulateBuf);
+        ChannelContext<? extends NetworkChannel> channelContext = ChannelUtil.getChannelContext(key);
+        ByteBuffer readBuffer = channelContext.getByteBuffer();
         if(readBuffer == null) {
             readBuffer = ByteBuffer.allocate(4096);
-            attachment.put(ChannelAttrName.attrAccumulateBuf, readBuffer);
+            channelContext.setByteBuffer(readBuffer);
         }
         return readBuffer;
     }
@@ -31,12 +29,7 @@ public class ChannelUtil {
     }
 
     public static ChannelContext<? extends NetworkChannel> getChannelContext(SelectionKey key) {
-        return (ChannelContext<? extends NetworkChannel>)ChannelUtil.getAttachment(key);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Map<String, Object> getAttachment(SelectionKey key) {
-        return (Map<String, Object>)key.attachment();
+        return (ChannelContext<? extends NetworkChannel>)key.attachment();
     }
 
     public static void write(SocketChannel channel, byte[] bytes) throws IOException {
