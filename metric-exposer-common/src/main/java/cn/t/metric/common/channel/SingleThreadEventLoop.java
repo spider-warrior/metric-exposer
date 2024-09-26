@@ -33,10 +33,12 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
                     while (it.hasNext()) {
                         SelectionKey key = it.next();
                         it.remove();
-                        try {
-                            ChannelUtil.getChannelContext(key).invokeChannelRead(key);
-                        } catch (Throwable t) {
-                            ChannelUtil.getChannelContext(key).invokeChannelError(t);
+                        if (key.isValid() && key.isReadable()) {
+                            try {
+                                ChannelUtil.getChannelContext(key).invokeChannelRead(key);
+                            } catch (Throwable t) {
+                                ChannelUtil.getChannelContext(key).invokeChannelError(t);
+                            }
                         }
                     }
                 }

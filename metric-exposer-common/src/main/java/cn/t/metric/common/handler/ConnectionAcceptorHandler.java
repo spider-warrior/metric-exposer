@@ -31,9 +31,7 @@ public class ConnectionAcceptorHandler implements ChannelHandler<ServerSocketCha
         //初始化channel
         channelInitializer.initChannel(channelContext, socketChannel);
         //注册读事件
-        System.out.println("时间差: " + (System.currentTimeMillis() - start));
         workerLoop.register(socketChannel, SelectionKey.OP_READ, attrs);
-        System.out.println("时间差: " + (System.currentTimeMillis() - start));
         // 连接就绪
         channelContext.invokeChannelReady();
     }
