@@ -33,12 +33,19 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
                     while (it.hasNext()) {
                         SelectionKey key = it.next();
                         it.remove();
-                        if (key.isValid() && key.isReadable()) {
-                            try {
-                                ChannelUtil.getChannelContext(key).invokeChannelRead(key);
-                            } catch (Throwable t) {
-                                ChannelUtil.getChannelContext(key).invokeChannelError(t);
+                        if(key.isValid()) {
+                            if (key.isConnectable()) {
+                                ChannelUtil.getChannelContext(key).invokeChannelReady();
                             }
+                            if(key.isWritable()) {
+                                //todo 连接可写
+                            }
+                            if(key.isReadable() || key.isAcceptable()) {
+                                ChannelUtil.getChannelContext(key).invokeChannelRead(key);
+                            }
+                        } else {
+                            // 连接关闭
+                            ChannelUtil.getChannelContext(key).invokeChannelClose();
                         }
                     }
                 }

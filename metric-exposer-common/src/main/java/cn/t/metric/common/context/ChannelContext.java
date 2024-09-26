@@ -5,7 +5,6 @@ import cn.t.metric.common.handler.ChannelHandler;
 import java.io.IOException;
 import java.nio.channels.NetworkChannel;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -14,8 +13,9 @@ public class ChannelContext<C extends NetworkChannel> {
     private final C channel;
     private final List<ChannelHandler<C>> channelHandlerList = new ArrayList<>();
     private Iterator<ChannelHandler<C>> channelReadyIt;
-    private Iterator<ChannelHandler<C>> messageReadIt;
-    private Iterator<ChannelHandler<C>> messageWriteIt;
+    private Iterator<ChannelHandler<C>> channelReadIt;
+    private Iterator<ChannelHandler<C>> channelWriteIt;
+    private Iterator<ChannelHandler<C>> channelCloseIt;
 
     public C getChannel() {
         return channel;
@@ -49,39 +49,52 @@ public class ChannelContext<C extends NetworkChannel> {
     }
 
     public void invokeChannelRead(Object msg) {
-        this.messageReadIt = channelHandlerList.iterator();
+        this.channelReadIt = channelHandlerList.iterator();
         this.invokeNextChannelRead(msg);
     }
 
     public void invokeNextChannelRead(Object msg) {
         try {
-            messageReadIt.next().read(this, msg);
+            this.channelReadIt.next().read(this, msg);
         } catch (Throwable t) {
             invokeNextChannelError(t);
         }
     }
 
     public void invokeChannelWrite(Object msg) {
-        this.messageWriteIt = channelHandlerList.iterator();
+        this.channelWriteIt = channelHandlerList.iterator();
         this.invokeNextChannelWrite(msg);
     }
 
     public void invokeNextChannelWrite(Object msg) {
         try {
-            messageWriteIt.next().write(this, msg);
+            this.channelWriteIt.next().write(this, msg);
         } catch (Throwable t) {
             invokeNextChannelError(t);
         }
     }
 
+    public void invokeChannelClose() {
+        this.channelCloseIt = channelHandlerList.iterator();
+        this.invokeNextChannelClose();
+    }
+
+    public void invokeNextChannelClose() {
+        try {
+            this.channelCloseIt.next().close(this);
+        } catch (Throwable subThrowable) {
+            invokeNextChannelError(subThrowable);
+        }
+    }
+
     public void invokeChannelError(Throwable t) {
-        this.messageReadIt = channelHandlerList.iterator();
+        this.channelReadIt = channelHandlerList.iterator();
         this.invokeNextChannelError(t);
     }
 
     public void invokeNextChannelError(Throwable t) {
         try {
-            messageReadIt.next().error(this, t);
+            this.channelReadIt.next().error(this, t);
         } catch (Throwable subThrowable) {
             invokeNextChannelError(subThrowable);
         }
