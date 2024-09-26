@@ -19,7 +19,6 @@ public class ConnectionAcceptorHandler implements ChannelHandler<ServerSocketCha
 
     @Override
     public void read(ChannelContext<ServerSocketChannel> ctx, Object msg) throws Exception {
-        long start = System.currentTimeMillis();
         SelectionKey selectionKey = (SelectionKey)msg;
         SocketChannel socketChannel = ((ServerSocketChannel)selectionKey.channel()).accept();
         socketChannel.configureBlocking(false);
