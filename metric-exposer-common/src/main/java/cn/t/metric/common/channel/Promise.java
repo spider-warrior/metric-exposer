@@ -23,7 +23,7 @@ public class Promise<V> {
         if(firstNode != null) {
             PromiseListenerNode<V> current = firstNode;
             while(true) {
-                current.setExecuted(true);
+                current.executed();
                 notify(current.getListener());
                 PromiseListenerNode<V> next = current.getNext();
                 if(next == null) {
@@ -39,16 +39,15 @@ public class Promise<V> {
             PromiseListenerNode<V> newNode = new PromiseListenerNode<>(listener);
             if(this.firstNode == null) {
                 this.firstNode = newNode;
-                this.currentNode = newNode;
             } else {
                 this.currentNode.setNext(newNode);
-                this.currentNode = newNode;
             }
+            this.currentNode = newNode;
             //二次检查发送状态, 如果此时已有响应结果有可能遗漏当前listener执行
             if(status != null) {
                 //lastLoopNode不为空说明已循环通知完毕
                 if(lastLoopNode != null) {
-                    //此时检查newNode状态，如果未执行则立即执行（lastLoopNode晚于node.setExecuted(true)执行）
+                    //此时检查newNode状态，如果未执行则立即执行（lastLoopNode晚于node.setExecuted(true)执行, 如果lastLoopNode不为空则确定node的execute一定被设置）
                     if(!newNode.isExecuted()) {
                         notify(listener);
                     }

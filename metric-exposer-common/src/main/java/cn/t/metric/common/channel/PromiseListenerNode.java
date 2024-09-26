@@ -13,8 +13,8 @@ public class PromiseListenerNode<V> {
         return executed;
     }
 
-    public void setExecuted(boolean executed) {
-        this.executed = executed;
+    public void executed() {
+        this.executed = true;
     }
 
     public PromiseListenerNode<V> getNext() {

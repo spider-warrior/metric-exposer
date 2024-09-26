@@ -12,9 +12,9 @@ import java.util.Map;
 public class ChannelContext {
 
     private final Map<String, Object> attrs = new HashMap<>();
-    private final ChannelPipeline channelPipeline = new ChannelPipeline(this);;
     private final Channel channel;
-    private SelectionKey selectionKey;
+    private final SelectionKey selectionKey;
+    private final ChannelPipeline channelPipeline;
     private ByteBuffer byteBuffer;
 
     public Channel getChannel() {
@@ -51,12 +51,9 @@ public class ChannelContext {
         return selectionKey;
     }
 
-    public void setSelectionKey(SelectionKey selectionKey) {
-        this.selectionKey = selectionKey;
-    }
-
-    public ChannelContext(Channel channel) {
+    public ChannelContext(Channel channel, SelectionKey selectionKey, ChannelPipeline channelPipeline) {
         this.channel = channel;
+        this.selectionKey = selectionKey;
+        this.channelPipeline = channelPipeline;
     }
-
 }
