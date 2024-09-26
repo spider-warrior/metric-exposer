@@ -4,14 +4,13 @@ import cn.t.metric.common.handler.ChannelHandler;
 
 import java.io.IOException;
 import java.nio.channels.NetworkChannel;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class ChannelContext<C extends NetworkChannel> {
 
     private final C channel;
     private final List<ChannelHandler<C>> channelHandlerList = new ArrayList<>();
+    private final Map<String, Object> attrs = new HashMap<>();
     private Iterator<ChannelHandler<C>> channelReadyIt;
     private Iterator<ChannelHandler<C>> channelReadIt;
     private Iterator<ChannelHandler<C>> channelWriteIt;
@@ -98,6 +97,14 @@ public class ChannelContext<C extends NetworkChannel> {
         } catch (Throwable subThrowable) {
             invokeNextChannelError(subThrowable);
         }
+    }
+
+    public Object getAttribute(String name) {
+        return this.attrs.get(name);
+    }
+
+    public void setAttribute(String name, Object value) {
+        this.attrs.put(name, value);
     }
 
     public ChannelContext(C channel) {

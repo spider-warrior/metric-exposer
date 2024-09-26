@@ -1,15 +1,13 @@
 package cn.t.metric.common.channel;
 
 import cn.t.metric.common.constants.EventLoopStatus;
+import cn.t.metric.common.context.ChannelContext;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.ExceptionUtil;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SelectableChannel;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
+import java.nio.channels.*;
 import java.util.Iterator;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -73,13 +71,13 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
         return thread == this.thread;
     }
 
-    public final void register(SelectableChannel selectableChannel, int ops, Object attr) throws ClosedChannelException {
+    public final void register(SelectableChannel selectableChannel, int ops, ChannelContext<?> channelContext) throws ClosedChannelException {
         if(inEventLoop(Thread.currentThread())) {
-            selectableChannel.register(this.selector, ops, attr);
+            selectableChannel.register(this.selector, ops, channelContext);
         } else {
             addTask(() -> {
                 try {
-                    selectableChannel.register(this.selector, ops, attr);
+                    selectableChannel.register(this.selector, ops, channelContext);
                 } catch (ClosedChannelException e) {
                     throw new RuntimeException(e);
                 }

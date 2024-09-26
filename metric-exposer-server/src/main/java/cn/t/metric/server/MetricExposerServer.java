@@ -1,6 +1,5 @@
 package cn.t.metric.server;
 
-import cn.t.metric.common.constants.ChannelAttrName;
 import cn.t.metric.common.context.ChannelContext;
 import cn.t.metric.common.repository.SystemInfoRepository;
 import cn.t.metric.common.util.ChannelUtil;
@@ -16,9 +15,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -96,9 +93,7 @@ public class MetricExposerServer {
         socketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, false);
         socketChannel.setOption(StandardSocketOptions.TCP_NODELAY, false);
         ChannelContext channelContext = new ChannelContext(socketChannel);
-        Map<String, Object> attrs = new HashMap<>();
-        attrs.put(ChannelAttrName.attrChannelContext, channelContext);
-        socketChannel.register(key.selector(), SelectionKey.OP_READ, attrs);
+        socketChannel.register(key.selector(), SelectionKey.OP_READ, channelContext);
     }
 
     private void handleReadEvent(SelectionKey key) throws IOException {

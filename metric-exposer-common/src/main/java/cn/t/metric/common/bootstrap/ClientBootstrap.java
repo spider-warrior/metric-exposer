@@ -2,7 +2,6 @@ package cn.t.metric.common.bootstrap;
 
 import cn.t.metric.common.channel.ChannelInitializer;
 import cn.t.metric.common.channel.SingleThreadEventLoop;
-import cn.t.metric.common.constants.ChannelAttrName;
 import cn.t.metric.common.context.ChannelContext;
 
 import java.io.IOException;
@@ -10,8 +9,6 @@ import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
@@ -28,9 +25,7 @@ public class ClientBootstrap {
         channelContext.invokeChannelReady();
 
         // 注册read事件
-        Map<String, Object> attrs = new HashMap<>();
-        attrs.put(ChannelAttrName.attrChannelContext, channelContext);
-        workerLoop.register(socketChannel, SelectionKey.OP_READ, attrs);
+        workerLoop.register(socketChannel, SelectionKey.OP_READ, channelContext);
 
         // 启动worker线程
         new Thread(workerLoop).start();

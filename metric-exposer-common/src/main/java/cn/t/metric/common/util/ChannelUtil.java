@@ -2,8 +2,8 @@
 package cn.t.metric.common.util;
 
 
-import cn.t.metric.common.context.ChannelContext;
 import cn.t.metric.common.constants.ChannelAttrName;
+import cn.t.metric.common.context.ChannelContext;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -31,7 +31,7 @@ public class ChannelUtil {
     }
 
     public static ChannelContext<? extends NetworkChannel> getChannelContext(SelectionKey key) {
-        return (ChannelContext<? extends NetworkChannel>)ChannelUtil.getAttachment(key).get(ChannelAttrName.attrChannelContext);
+        return (ChannelContext<? extends NetworkChannel>)ChannelUtil.getAttachment(key);
     }
 
     @SuppressWarnings("unchecked")

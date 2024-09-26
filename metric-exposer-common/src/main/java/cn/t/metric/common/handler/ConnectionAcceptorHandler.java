@@ -2,15 +2,12 @@ package cn.t.metric.common.handler;
 
 import cn.t.metric.common.channel.ChannelInitializer;
 import cn.t.metric.common.channel.SingleThreadEventLoop;
-import cn.t.metric.common.constants.ChannelAttrName;
 import cn.t.metric.common.context.ChannelContext;
 
 import java.net.StandardSocketOptions;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ConnectionAcceptorHandler implements ChannelHandler<ServerSocketChannel> {
 
@@ -25,12 +22,10 @@ public class ConnectionAcceptorHandler implements ChannelHandler<ServerSocketCha
         socketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, false);
         socketChannel.setOption(StandardSocketOptions.TCP_NODELAY, false);
         ChannelContext<SocketChannel> channelContext = new ChannelContext<>(socketChannel);
-        Map<String, Object> attrs = new HashMap<>();
-        attrs.put(ChannelAttrName.attrChannelContext, channelContext);
         //初始化channel
         channelInitializer.initChannel(channelContext, socketChannel);
         //注册读事件
-        workerLoop.register(socketChannel, SelectionKey.OP_READ, attrs);
+        workerLoop.register(socketChannel, SelectionKey.OP_READ, channelContext);
         // 连接就绪
         channelContext.invokeChannelReady();
     }
