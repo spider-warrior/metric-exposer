@@ -14,9 +14,9 @@ import java.nio.channels.SocketChannel;
 public class DiscInfoChannelHandler extends AbstractChannelHandler {
 
     @Override
-    public void read(ChannelContext<SocketChannel> ctx, Object msg) throws IOException {
+    public void read(ChannelContext ctx, Object msg) throws IOException {
         if(msg instanceof DiscInfo) {
-            SocketChannel socketChannel = ctx.getChannel();
+            SocketChannel socketChannel = (SocketChannel)ctx.getChannel();
             InetSocketAddress socketAddress = (InetSocketAddress)socketChannel.getRemoteAddress();
             SystemInfo systemInfo = systemInfoRepository.queryById(socketAddress.getHostString());
             PopulateUtil.populateDiscInfo(systemInfo, (DiscInfo)msg);

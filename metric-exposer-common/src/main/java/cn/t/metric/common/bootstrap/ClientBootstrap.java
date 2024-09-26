@@ -18,7 +18,7 @@ public class ClientBootstrap {
         SocketChannel socketChannel = connect(serverHost, serverPort);
 
         // 构建channelContext
-        ChannelContext<SocketChannel> ctx = new ChannelContext<>(socketChannel);
+        ChannelContext ctx = new ChannelContext(socketChannel);
         channelInitializer.initChannel(ctx, socketChannel);
 
         // 连接就绪

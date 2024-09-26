@@ -9,19 +9,19 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
-public class ConnectionAcceptorHandler implements ChannelHandler<ServerSocketChannel> {
+public class ConnectionAcceptorHandler implements ChannelHandler {
 
     private final ChannelInitializer<SocketChannel> channelInitializer;
     private final SingleThreadEventLoop workerLoop;
 
     @Override
-    public void read(ChannelContext<ServerSocketChannel> ctx, Object msg) throws Exception {
+    public void read(ChannelContext ctx, Object msg) throws Exception {
         SelectionKey selectionKey = (SelectionKey)msg;
         SocketChannel socketChannel = ((ServerSocketChannel)selectionKey.channel()).accept();
         socketChannel.configureBlocking(false);
         socketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, false);
         socketChannel.setOption(StandardSocketOptions.TCP_NODELAY, false);
-        ChannelContext<SocketChannel> channelContext = new ChannelContext<>(socketChannel);
+        ChannelContext channelContext = new ChannelContext(socketChannel);
         //初始化channel
         channelInitializer.initChannel(channelContext, socketChannel);
         //注册读事件
@@ -31,8 +31,8 @@ public class ConnectionAcceptorHandler implements ChannelHandler<ServerSocketCha
     }
 
     @Override
-    public void ready(ChannelContext<ServerSocketChannel> ctx) {
-        ServerSocketChannel serverSocketChannel = ctx.getChannel();
+    public void ready(ChannelContext ctx) {
+        ServerSocketChannel serverSocketChannel = (ServerSocketChannel)ctx.getChannel();
         System.out.println("channel ready: " + serverSocketChannel);
     }
 

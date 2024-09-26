@@ -8,20 +8,20 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ChannelPipeline<C extends NetworkChannel> {
-    private final List<ChannelHandler<C>> channelHandlerList = new ArrayList<>();
-    private final ChannelContext<C> ctx;
+public class ChannelPipeline {
+    private final List<ChannelHandler> channelHandlerList = new ArrayList<>();
+    private final ChannelContext ctx;
 
-    private Iterator<ChannelHandler<C>> channelReadyIt;
-    private Iterator<ChannelHandler<C>> channelReadIt;
-    private Iterator<ChannelHandler<C>> channelWriteIt;
-    private Iterator<ChannelHandler<C>> channelCloseIt;
+    private Iterator<ChannelHandler> channelReadyIt;
+    private Iterator<ChannelHandler> channelReadIt;
+    private Iterator<ChannelHandler> channelWriteIt;
+    private Iterator<ChannelHandler> channelCloseIt;
 
-    public void addMessageHandlerLast(ChannelHandler<C> channelHandler) {
+    public void addMessageHandlerLast(ChannelHandler channelHandler) {
         this.channelHandlerList.add(channelHandler);
     }
 
-    public void addMessageHandlerFirst(ChannelHandler<C> channelHandler) {
+    public void addMessageHandlerFirst(ChannelHandler channelHandler) {
         this.channelHandlerList.add(0, channelHandler);
     }
 
@@ -90,7 +90,7 @@ public class ChannelPipeline<C extends NetworkChannel> {
         }
     }
 
-    public ChannelPipeline(ChannelContext<C> ctx) {
+    public ChannelPipeline(ChannelContext ctx) {
         this.ctx = ctx;
     }
 }

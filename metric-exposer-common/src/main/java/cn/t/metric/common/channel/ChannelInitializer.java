@@ -1,7 +1,7 @@
 package cn.t.metric.common.channel;
 
-import java.nio.channels.NetworkChannel;
+import java.nio.channels.Channel;
 
-public abstract class ChannelInitializer <C extends NetworkChannel> {
-    public abstract void initChannel(ChannelContext<C> ctx, C ch) throws Exception;
+public abstract class ChannelInitializer <C extends Channel> {
+    public abstract void initChannel(ChannelContext ctx, C ch) throws Exception;
 }

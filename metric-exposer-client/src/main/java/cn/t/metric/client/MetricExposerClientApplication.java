@@ -1,9 +1,9 @@
 package cn.t.metric.client;
 
 import cn.t.metric.common.bootstrap.ClientBootstrap;
+import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.channel.ChannelInitializer;
 import cn.t.metric.common.channel.SingleThreadEventLoop;
-import cn.t.metric.common.channel.ChannelContext;
 
 import java.nio.channels.SocketChannel;
 
@@ -13,7 +13,7 @@ public class MetricExposerClientApplication {
         int serverPort = 5000;
         ChannelInitializer<SocketChannel> channelInitializer = new ChannelInitializer<SocketChannel>() {
             @Override
-            public void initChannel(ChannelContext<SocketChannel> ctx, SocketChannel ch) throws Exception {
+            public void initChannel(ChannelContext ctx, SocketChannel ch) throws Exception {
                 ctx.getChannelPipeline().addMessageHandlerLast(new CmdRequestHandler());
             }
         };

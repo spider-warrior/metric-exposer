@@ -14,11 +14,11 @@ import java.util.Optional;
 public class ChannelUtil {
 
     public static ByteBuffer getChannelBuffer(SelectionKey key) {
-        ChannelContext<? extends NetworkChannel> channelContext = ChannelUtil.getChannelContext(key);
-        ByteBuffer readBuffer = channelContext.getByteBuffer();
+        ChannelContext ctx = ChannelUtil.getChannelContext(key);
+        ByteBuffer readBuffer = ctx.getByteBuffer();
         if(readBuffer == null) {
             readBuffer = ByteBuffer.allocate(4096);
-            channelContext.setByteBuffer(readBuffer);
+            ctx.setByteBuffer(readBuffer);
         }
         return readBuffer;
     }
@@ -28,8 +28,8 @@ public class ChannelUtil {
         Optional.ofNullable(getChannelContext(key)).ifPresent(ChannelContext::close);
     }
 
-    public static ChannelContext<? extends NetworkChannel> getChannelContext(SelectionKey key) {
-        return (ChannelContext<? extends NetworkChannel>)key.attachment();
+    public static ChannelContext getChannelContext(SelectionKey key) {
+        return (ChannelContext)key.attachment();
     }
 
     public static void write(SocketChannel channel, byte[] bytes) throws IOException {

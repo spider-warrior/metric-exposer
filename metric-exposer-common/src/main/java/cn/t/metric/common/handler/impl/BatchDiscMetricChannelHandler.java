@@ -12,9 +12,9 @@ import java.nio.channels.SocketChannel;
 
 public class BatchDiscMetricChannelHandler extends AbstractChannelHandler {
     @Override
-    public void read(ChannelContext<SocketChannel> ctx, Object msg) throws IOException {
+    public void read(ChannelContext ctx, Object msg) throws IOException {
         if(msg instanceof BatchDiscMetric) {
-            SocketChannel socketChannel = ctx.getChannel();
+            SocketChannel socketChannel = (SocketChannel)ctx.getChannel();
             InetSocketAddress socketAddress = (InetSocketAddress)socketChannel.getRemoteAddress();
             PopulateUtil.populateDiscInfo(systemInfoRepository.queryById(socketAddress.getHostString()).getDiscInfoList(), ((BatchDiscMetric)msg).getDiscMetricList());
         } else {

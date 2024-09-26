@@ -9,9 +9,9 @@ import java.nio.channels.SocketChannel;
 
 public class HeartBeatChannelHandler extends AbstractChannelHandler {
     @Override
-    public void read(ChannelContext<SocketChannel> ctx, Object msg) throws Exception {
+    public void read(ChannelContext ctx, Object msg) throws Exception {
         if(msg instanceof HeartBeat) {
-            System.out.printf("心跳: 远程地址: %s%n", ctx.getChannel().getRemoteAddress());
+            System.out.printf("心跳: 远程地址: %s%n", ((SocketChannel)ctx.getChannel()).getRemoteAddress());
         } else {
             ctx.getChannelPipeline().invokeNextChannelRead(msg);
         }

@@ -12,9 +12,9 @@ import java.nio.channels.SocketChannel;
 
 public class BatchNetworkMetricChannelHandler extends AbstractChannelHandler {
     @Override
-    public void read(ChannelContext<SocketChannel> ctx, Object msg) throws IOException {
+    public void read(ChannelContext ctx, Object msg) throws IOException {
         if(msg instanceof BatchNetworkMetric) {
-            SocketChannel socketChannel = ctx.getChannel();
+            SocketChannel socketChannel = (SocketChannel)ctx.getChannel();
             InetSocketAddress socketAddress = (InetSocketAddress)socketChannel.getRemoteAddress();
             PopulateUtil.populateNetworkInterfaceInfo(systemInfoRepository.queryById(socketAddress.getHostString()).getNetworkInterfaceInfoList(), ((BatchNetworkMetric)msg).getNetworkMetricList());
         } else {

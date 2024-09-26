@@ -20,7 +20,7 @@ public class ServerBootstrap {
         serverSocketChannel.socket().bind(new InetSocketAddress(bindAddress, bindPrt), 128);
 
         // 构建serverSocketChannelContext
-        ChannelContext<ServerSocketChannel> serverSocketCtx = new ChannelContext<>(serverSocketChannel);
+        ChannelContext serverSocketCtx = new ChannelContext(serverSocketChannel);
         serverSocketCtx.getChannelPipeline().addMessageHandlerFirst(new ConnectionAcceptorHandler(channelInitializer, workerLoop));
 
         // 监听就绪

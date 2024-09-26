@@ -4,20 +4,20 @@ import cn.t.metric.common.pipeline.ChannelPipeline;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.NetworkChannel;
+import java.nio.channels.Channel;
 import java.nio.channels.SelectionKey;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChannelContext<C extends NetworkChannel> {
+public class ChannelContext {
 
     private final Map<String, Object> attrs = new HashMap<>();
-    private final ChannelPipeline<C> channelPipeline = new ChannelPipeline<>(this);;
-    private final C channel;
+    private final ChannelPipeline channelPipeline = new ChannelPipeline(this);;
+    private final Channel channel;
     private SelectionKey selectionKey;
     private ByteBuffer byteBuffer;
 
-    public C getChannel() {
+    public Channel getChannel() {
         return channel;
     }
 
@@ -43,7 +43,7 @@ public class ChannelContext<C extends NetworkChannel> {
         this.attrs.put(name, value);
     }
 
-    public ChannelPipeline<C> getChannelPipeline() {
+    public ChannelPipeline getChannelPipeline() {
         return channelPipeline;
     }
 
@@ -55,7 +55,7 @@ public class ChannelContext<C extends NetworkChannel> {
         this.selectionKey = selectionKey;
     }
 
-    public ChannelContext(C channel) {
+    public ChannelContext(Channel channel) {
         this.channel = channel;
     }
 

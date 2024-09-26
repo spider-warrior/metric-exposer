@@ -73,7 +73,7 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
         return thread == this.thread;
     }
 
-    public void register(SelectableChannel selectableChannel, int ops, ChannelContext<?> channelContext) throws ClosedChannelException {
+    public void register(SelectableChannel selectableChannel, int ops, ChannelContext channelContext) throws ClosedChannelException {
         if(inEventLoop(Thread.currentThread())) {
             doRegister(selectableChannel, ops, channelContext);
         } else {
@@ -87,7 +87,7 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
         }
     }
 
-    private void doRegister(SelectableChannel channel, int ops, ChannelContext<?> channelContext) throws ClosedChannelException {
+    private void doRegister(SelectableChannel channel, int ops, ChannelContext channelContext) throws ClosedChannelException {
         SelectionKey selectionKey = channel.register(this.selector, ops, channelContext);
         channelContext.setSelectionKey(selectionKey);
     }
