@@ -1,8 +1,11 @@
 package cn.t.metric.common.channel;
 
+import cn.t.metric.common.pipeline.ChannelPipeline;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.NetworkChannel;
+import java.nio.channels.SelectionKey;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +14,7 @@ public class ChannelContext<C extends NetworkChannel> {
     private final Map<String, Object> attrs = new HashMap<>();
     private final ChannelPipeline<C> channelPipeline = new ChannelPipeline<>(this);;
     private final C channel;
+    private SelectionKey selectionKey;
     private ByteBuffer byteBuffer;
 
     public C getChannel() {
@@ -64,6 +68,14 @@ public class ChannelContext<C extends NetworkChannel> {
 
     public ChannelPipeline<C> getChannelPipeline() {
         return channelPipeline;
+    }
+
+    public SelectionKey getSelectionKey() {
+        return selectionKey;
+    }
+
+    public void setSelectionKey(SelectionKey selectionKey) {
+        this.selectionKey = selectionKey;
     }
 
     public ChannelContext(C channel) {

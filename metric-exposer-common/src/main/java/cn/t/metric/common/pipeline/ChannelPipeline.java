@@ -1,5 +1,6 @@
-package cn.t.metric.common.channel;
+package cn.t.metric.common.pipeline;
 
+import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.handler.ChannelHandler;
 
 import java.nio.channels.NetworkChannel;

@@ -6,7 +6,10 @@ import cn.t.metric.common.util.ExceptionUtil;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.channels.*;
+import java.nio.channels.ClosedChannelException;
+import java.nio.channels.SelectableChannel;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.util.Iterator;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -70,18 +73,23 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
         return thread == this.thread;
     }
 
-    public final void register(SelectableChannel selectableChannel, int ops, ChannelContext<?> channelContext) throws ClosedChannelException {
+    public void register(SelectableChannel selectableChannel, int ops, ChannelContext<?> channelContext) throws ClosedChannelException {
         if(inEventLoop(Thread.currentThread())) {
-            selectableChannel.register(this.selector, ops, channelContext);
+            doRegister(selectableChannel, ops, channelContext);
         } else {
             addTask(() -> {
                 try {
-                    selectableChannel.register(this.selector, ops, channelContext);
+                    doRegister(selectableChannel, ops, channelContext);
                 } catch (ClosedChannelException e) {
                     throw new RuntimeException(e);
                 }
             });
         }
+    }
+
+    private void doRegister(SelectableChannel channel, int ops, ChannelContext<?> channelContext) throws ClosedChannelException {
+        SelectionKey selectionKey = channel.register(this.selector, ops, channelContext);
+        channelContext.setSelectionKey(selectionKey);
     }
 
     public void addTask(Runnable runnable) {
