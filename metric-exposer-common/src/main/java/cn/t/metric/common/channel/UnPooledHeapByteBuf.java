@@ -10,6 +10,12 @@ public class UnPooledHeapByteBuf {
     private int writerIndex = 0;
     private int lastExpandSize = 0;
 
+    public UnPooledHeapByteBuf writeByte(byte value) {
+        ensureWritable(1);
+        buf[writerIndex++] = value;
+        return this;
+    }
+
     public int writerIndex() {
         return writerIndex;
     }
@@ -40,6 +46,8 @@ public class UnPooledHeapByteBuf {
                     //保证扩容大小是单调递增
                     if(expandSize < lastExpandSize) {
                         expandSize = lastExpandSize;
+                    } else {
+                        lastExpandSize = expandSize;
                     }
                 }
                 int newCapacity = buf.length + expandSize;
