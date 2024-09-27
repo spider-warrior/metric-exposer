@@ -87,7 +87,8 @@ public class MetricExposerClient {
 
     private void handleReadEvent(SelectionKey key) throws IOException {
         SocketChannel sc = (SocketChannel)key.channel();
-        ByteBuffer readBuffer = ChannelUtil.getChannelBuffer(key);
+//        ByteBuffer readBuffer = ChannelUtil.getChannelBuffer(key);
+        ByteBuffer readBuffer = ByteBuffer.allocate(4096);
         //服务端宕机此处抛出IO异常
         int length = sc.read(readBuffer);
         if(length > 0) {

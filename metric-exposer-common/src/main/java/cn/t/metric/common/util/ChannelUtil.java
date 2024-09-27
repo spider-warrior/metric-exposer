@@ -6,22 +6,11 @@ import cn.t.metric.common.channel.ChannelContext;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.NetworkChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Optional;
 
 public class ChannelUtil {
-
-    public static ByteBuffer getChannelBuffer(SelectionKey key) {
-        ChannelContext ctx = ChannelUtil.getChannelContext(key);
-        ByteBuffer readBuffer = ctx.getByteBuffer();
-        if(readBuffer == null) {
-            readBuffer = ByteBuffer.allocate(4096);
-            ctx.setByteBuffer(readBuffer);
-        }
-        return readBuffer;
-    }
 
     public static void closeChannel(SelectionKey key) {
         key.cancel();

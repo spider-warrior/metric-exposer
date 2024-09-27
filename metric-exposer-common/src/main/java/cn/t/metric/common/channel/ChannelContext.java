@@ -15,7 +15,7 @@ public class ChannelContext {
     private final Channel channel;
     private final SelectionKey selectionKey;
     private final ChannelPipeline pipeline;
-    private ByteBuffer byteBuffer;
+    private ByteBuffer readBuffer;
 
     public Channel getChannel() {
         return channel;
@@ -27,12 +27,12 @@ public class ChannelContext {
         }
     }
 
-    public ByteBuffer getByteBuffer() {
-        return byteBuffer;
+    public ByteBuffer getReadBuffer() {
+        return readBuffer;
     }
 
-    public void setByteBuffer(ByteBuffer byteBuffer) {
-        this.byteBuffer = byteBuffer;
+    public void setReadBuffer(ByteBuffer readBuffer) {
+        this.readBuffer = readBuffer;
     }
 
     public Object getAttribute(String name) {

@@ -5,6 +5,7 @@ import cn.t.metric.common.channel.ChannelInitializer;
 import cn.t.metric.common.channel.SingleThreadEventLoop;
 
 import java.net.StandardSocketOptions;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
@@ -23,8 +24,11 @@ public class ConnectionAcceptorHandler implements ChannelHandler {
         //注册读事件
         workerLoop.register(socketChannel, SelectionKey.OP_READ, channelInitializer).addListener(future -> {
             if (future.isSuccess()) {
+                ChannelContext subCtx = future.get();
+                // 初始化缓冲池
+                subCtx.setReadBuffer(ByteBuffer.allocate(4096));
                 // 连接就绪
-                future.get().invokeChannelReady();
+                subCtx.invokeChannelReady();
             }
         });
     }
