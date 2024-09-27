@@ -40,7 +40,10 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
                             if(key.isWritable()) {
                                 //todo 连接可写
                             }
-                            if(key.isReadable() || key.isAcceptable()) {
+                            if(key.isAcceptable()) {
+                                ChannelUtil.getChannelContext(key).invokeChannelRead(key.channel());
+                            }
+                            if(key.isReadable()) {
                                 ChannelUtil.getChannelContext(key).invokeChannelRead(key);
                             }
                         } else {
