@@ -25,7 +25,7 @@ public class ConnectionAcceptorHandler implements ChannelHandler {
         workerLoop.register(socketChannel, SelectionKey.OP_READ, channelInitializer).addListener(future -> {
             if (future.isSuccess()) {
                 // 连接就绪
-                future.get().getPipeline().invokeChannelReady(future.get());
+                future.get().invokeChannelReady();
             }
         });
     }

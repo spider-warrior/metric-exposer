@@ -19,7 +19,7 @@ public class ServerBootstrap {
         acceptLoop.register(serverSocketChannel, SelectionKey.OP_ACCEPT, initializer).addListener(future -> {
             if(future.isSuccess()) {
                 // 监听就绪
-                future.get().getPipeline().invokeChannelReady(future.get());
+                future.get().invokeChannelReady();
             }
         });
         // 启动accept线程

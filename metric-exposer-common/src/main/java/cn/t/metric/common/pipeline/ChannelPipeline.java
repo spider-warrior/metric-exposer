@@ -32,7 +32,7 @@ public class ChannelPipeline {
         try {
             channelReadyIt.next().ready(ctx);
         } catch (Throwable t) {
-            invokeNextChannelError(ctx, t);
+            invokeChannelError(ctx, t);
         }
     }
 
@@ -45,7 +45,7 @@ public class ChannelPipeline {
         try {
             this.channelReadIt.next().read(ctx, msg);
         } catch (Throwable t) {
-            invokeNextChannelError(ctx, t);
+            invokeChannelError(ctx, t);
         }
     }
 
@@ -58,7 +58,7 @@ public class ChannelPipeline {
         try {
             this.channelWriteIt.next().write(ctx, msg);
         } catch (Throwable t) {
-            invokeNextChannelError(ctx, t);
+            invokeChannelError(ctx, t);
         }
     }
 
@@ -71,7 +71,7 @@ public class ChannelPipeline {
         try {
             this.channelCloseIt.next().close(ctx);
         } catch (Throwable t) {
-            invokeNextChannelError(ctx, t);
+            invokeChannelError(ctx, t);
         }
     }
 
