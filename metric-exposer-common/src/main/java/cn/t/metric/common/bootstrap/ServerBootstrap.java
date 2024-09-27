@@ -9,7 +9,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 
 public class ServerBootstrap {
-    public static ServerSocketChannel bind(String bindAddress, int bindPrt, ChannelInitializer initializer, SingleThreadEventLoop acceptLoop, SingleThreadEventLoop workerLoop) throws Exception {
+    public static void bind(String bindAddress, int bindPrt, ChannelInitializer initializer, SingleThreadEventLoop acceptLoop, SingleThreadEventLoop workerLoop) throws Exception {
         ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
         // 绑定&监听
         serverSocketChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
@@ -26,6 +26,5 @@ public class ServerBootstrap {
         new Thread(acceptLoop, "accept-thread").start();
         // 启动worker线程
         new Thread(workerLoop, "worker-thread").start();
-        return serverSocketChannel;
     }
 }
