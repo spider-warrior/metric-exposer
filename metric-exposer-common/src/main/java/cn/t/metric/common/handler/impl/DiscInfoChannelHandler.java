@@ -21,7 +21,7 @@ public class DiscInfoChannelHandler extends AbstractChannelHandler {
             SystemInfo systemInfo = systemInfoRepository.queryById(socketAddress.getHostString());
             PopulateUtil.populateDiscInfo(systemInfo, (DiscInfo)msg);
         } else {
-            ctx.getPipeline().invokeNextChannelRead(ctx, msg);
+            ctx.invokeNextChannelRead(msg);
         }
     }
 

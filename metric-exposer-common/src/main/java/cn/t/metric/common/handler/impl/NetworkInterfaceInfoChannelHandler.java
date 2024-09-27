@@ -21,7 +21,7 @@ public class NetworkInterfaceInfoChannelHandler extends AbstractChannelHandler {
             SystemInfo systemInfo = systemInfoRepository.queryById(socketAddress.getHostString());
             PopulateUtil.populateNetworkInterfaceInfo(systemInfo, (NetworkInterfaceInfo)msg);
         } else {
-            ctx.getPipeline().invokeNextChannelRead(ctx, msg);
+            ctx.invokeNextChannelRead(msg);
         }
     }
 

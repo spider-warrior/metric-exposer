@@ -19,7 +19,7 @@ public class BatchDiscInfoChannelHandler extends AbstractChannelHandler {
             SystemInfo systemInfo = systemInfoRepository.queryById(socketAddress.getHostString());
             systemInfo.setDiscInfoList(((BatchDiscInfo)msg).getDiscInfoList());
         } else {
-            ctx.getPipeline().invokeNextChannelRead(ctx, msg);
+            ctx.invokeNextChannelRead(msg);
         }
     }
     public BatchDiscInfoChannelHandler(SystemInfoRepository systemInfoRepository) {

@@ -18,7 +18,7 @@ public class SystemInfoChannelHandler extends AbstractChannelHandler {
             InetSocketAddress socketAddress = (InetSocketAddress)socketChannel.getRemoteAddress();
             systemInfoRepository.save(socketAddress.getHostString(), (SystemInfo)msg);
         } else {
-            ctx.getPipeline().invokeNextChannelRead(ctx, msg);
+            ctx.invokeNextChannelRead(msg);
         }
     }
 

@@ -55,20 +55,40 @@ public class ChannelContext {
         pipeline.invokeChannelReady(this);
     }
 
+    public void invokeNextChannelReady() {
+        pipeline.invokeNextChannelReady(this);
+    }
+
     public void invokeChannelRead(Object msg) {
         pipeline.invokeChannelRead(this, msg);
+    }
+
+    public void invokeNextChannelRead(Object msg) {
+        pipeline.invokeNextChannelRead(this, msg);
     }
 
     public void invokeChannelWrite(Object msg) {
         pipeline.invokeChannelWrite(this, msg);
     }
 
+    public void invokeNextChannelWrite(Object msg) {
+        pipeline.invokeNextChannelWrite(this, msg);
+    }
+
     public void invokeChannelClose() {
         pipeline.invokeChannelClose(this);
     }
 
+    public void invokeNextChannelClose() {
+        pipeline.invokeNextChannelClose(this);
+    }
+
     public void invokeChannelError(Throwable t) {
         pipeline.invokeChannelError(this, t);
+    }
+
+    public void invokeNextChannelError(Throwable t) {
+        pipeline.invokeNextChannelError(this, t);
     }
 
     public ChannelContext(Channel channel, SelectionKey selectionKey, ChannelPipeline pipeline) {

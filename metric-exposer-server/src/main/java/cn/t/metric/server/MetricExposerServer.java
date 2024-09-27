@@ -111,7 +111,7 @@ public class MetricExposerServer {
                 if(message == null) {
                     break;
                 } else {
-                    ctx.getPipeline().invokeChannelRead(ctx, message);
+                    ctx.invokeChannelRead(message);
                 }
             }
             //convert to write mode

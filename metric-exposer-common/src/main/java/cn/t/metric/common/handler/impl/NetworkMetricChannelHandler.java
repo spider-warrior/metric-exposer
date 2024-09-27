@@ -30,7 +30,7 @@ public class NetworkMetricChannelHandler extends AbstractChannelHandler {
                 }
             }
         } else {
-            ctx.getPipeline().invokeNextChannelRead(ctx, msg);
+            ctx.invokeNextChannelRead(msg);
         }
     }
     public NetworkMetricChannelHandler(SystemInfoRepository systemInfoRepository) {
