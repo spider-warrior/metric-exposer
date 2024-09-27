@@ -12,7 +12,7 @@ public class CmdResponseChannelHandler extends AbstractChannelHandler {
             CmdResponse cmdResponse = (CmdResponse)msg;
             System.out.printf("命令响应, 执行状态: %b, 输出: %s%n", cmdResponse.isSuccess(), cmdResponse.getOutput());
         } else {
-            ctx.getChannelPipeline().invokeNextChannelRead(msg);
+            ctx.getPipeline().invokeNextChannelRead(ctx, msg);
         }
     }
     public CmdResponseChannelHandler(SystemInfoRepository systemInfoRepository) {

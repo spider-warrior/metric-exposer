@@ -1,6 +1,6 @@
 package cn.t.metric.common.channel;
 
+@FunctionalInterface
 public interface PromiseListener<V> {
-    void success(V result);
-    void failure(Throwable throwable);
+    void operationComplete(PromiseFuture<V> future);
 }

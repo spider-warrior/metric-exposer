@@ -3,14 +3,12 @@ package cn.t.metric.common.pipeline;
 import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.handler.ChannelHandler;
 
-import java.nio.channels.NetworkChannel;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class ChannelPipeline {
     private final List<ChannelHandler> channelHandlerList = new ArrayList<>();
-    private final ChannelContext ctx;
 
     private Iterator<ChannelHandler> channelReadyIt;
     private Iterator<ChannelHandler> channelReadIt;
@@ -25,72 +23,68 @@ public class ChannelPipeline {
         this.channelHandlerList.add(0, channelHandler);
     }
 
-    public void invokeChannelReady() {
+    public void invokeChannelReady(ChannelContext ctx) {
         this.channelReadyIt = channelHandlerList.iterator();
-        this.invokeNextChannelReady();
+        this.invokeNextChannelReady(ctx);
     }
 
-    public void invokeNextChannelReady() {
+    public void invokeNextChannelReady(ChannelContext ctx) {
         try {
-            channelReadyIt.next().ready(this.ctx);
+            channelReadyIt.next().ready(ctx);
         } catch (Throwable t) {
-            invokeNextChannelError(t);
+            invokeNextChannelError(ctx, t);
         }
     }
 
-    public void invokeChannelRead(Object msg) {
+    public void invokeChannelRead(ChannelContext ctx, Object msg) {
         this.channelReadIt = channelHandlerList.iterator();
-        this.invokeNextChannelRead(msg);
+        this.invokeNextChannelRead(ctx, msg);
     }
 
-    public void invokeNextChannelRead(Object msg) {
+    public void invokeNextChannelRead(ChannelContext ctx, Object msg) {
         try {
-            this.channelReadIt.next().read(this.ctx, msg);
+            this.channelReadIt.next().read(ctx, msg);
         } catch (Throwable t) {
-            invokeNextChannelError(t);
+            invokeNextChannelError(ctx, t);
         }
     }
 
-    public void invokeChannelWrite(Object msg) {
+    public void invokeChannelWrite(ChannelContext ctx, Object msg) {
         this.channelWriteIt = channelHandlerList.iterator();
-        this.invokeNextChannelWrite(msg);
+        this.invokeNextChannelWrite(ctx, msg);
     }
 
-    public void invokeNextChannelWrite(Object msg) {
+    public void invokeNextChannelWrite(ChannelContext ctx, Object msg) {
         try {
-            this.channelWriteIt.next().write(this.ctx, msg);
+            this.channelWriteIt.next().write(ctx, msg);
         } catch (Throwable t) {
-            invokeNextChannelError(t);
+            invokeNextChannelError(ctx, t);
         }
     }
 
-    public void invokeChannelClose() {
+    public void invokeChannelClose(ChannelContext ctx) {
         this.channelCloseIt = channelHandlerList.iterator();
-        this.invokeNextChannelClose();
+        this.invokeNextChannelClose(ctx);
     }
 
-    public void invokeNextChannelClose() {
+    public void invokeNextChannelClose(ChannelContext ctx) {
         try {
-            this.channelCloseIt.next().close(this.ctx);
+            this.channelCloseIt.next().close(ctx);
         } catch (Throwable t) {
-            invokeNextChannelError(t);
+            invokeNextChannelError(ctx, t);
         }
     }
 
-    public void invokeChannelError(Throwable t) {
+    public void invokeChannelError(ChannelContext ctx, Throwable t) {
         this.channelReadIt = channelHandlerList.iterator();
-        this.invokeNextChannelError(t);
+        this.invokeNextChannelError(ctx, t);
     }
 
-    public void invokeNextChannelError(Throwable t) {
+    public void invokeNextChannelError(ChannelContext ctx, Throwable t) {
         try {
-            this.channelReadIt.next().error(this.ctx, t);
+            this.channelReadIt.next().error(ctx, t);
         } catch (Throwable subThrowable) {
-            invokeNextChannelError(t);
+            invokeNextChannelError(ctx, t);
         }
-    }
-
-    public ChannelPipeline(ChannelContext ctx) {
-        this.ctx = ctx;
     }
 }

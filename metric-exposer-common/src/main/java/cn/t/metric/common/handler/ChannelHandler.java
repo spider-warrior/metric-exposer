@@ -7,7 +7,7 @@ public interface ChannelHandler {
     default void ready(ChannelContext ctx) throws Exception {}
     void read(ChannelContext channelContext, Object msg) throws Exception;
     default void write(ChannelContext ctx, Object msg) throws Exception {
-        ctx.getChannelPipeline().invokeNextChannelWrite(msg);
+        ctx.getPipeline().invokeNextChannelWrite(ctx, msg);
     }
     default void close(ChannelContext ctx) throws Exception {}
     default void error(ChannelContext ctx, Throwable t) throws Exception {

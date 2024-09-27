@@ -1,12 +1,12 @@
 package cn.t.metric.common.channel;
 
 import cn.t.metric.common.constants.EventLoopStatus;
+import cn.t.metric.common.pipeline.ChannelPipeline;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.ExceptionUtil;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -35,17 +35,17 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
                         it.remove();
                         if(key.isValid()) {
                             if (key.isConnectable()) {
-                                ChannelUtil.getChannelContext(key).getChannelPipeline().invokeChannelReady();
+                                ChannelUtil.getChannelContext(key).invokeChannelReady();
                             }
                             if(key.isWritable()) {
                                 //todo 连接可写
                             }
                             if(key.isReadable() || key.isAcceptable()) {
-                                ChannelUtil.getChannelContext(key).getChannelPipeline().invokeChannelRead(key);
+                                ChannelUtil.getChannelContext(key).invokeChannelRead(key);
                             }
                         } else {
                             // 连接关闭
-                            ChannelUtil.getChannelContext(key).getChannelPipeline().invokeChannelClose();
+                            ChannelUtil.getChannelContext(key).invokeChannelClose();
                         }
                     }
                 }
@@ -73,23 +73,29 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
         return thread == this.thread;
     }
 
-    public void register(SelectableChannel selectableChannel, int ops, ChannelContext channelContext) throws ClosedChannelException {
+    public Promise<ChannelContext> register(SelectableChannel channel, int ops, ChannelInitializer initializer) {
         if(inEventLoop(Thread.currentThread())) {
-            doRegister(selectableChannel, ops, channelContext);
+            Promise<ChannelContext> promise = new Promise<>();
+            doRegister(channel, ops, initializer, promise);
+            return promise;
         } else {
-            addTask(() -> {
-                try {
-                    doRegister(selectableChannel, ops, channelContext);
-                } catch (ClosedChannelException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            Promise<ChannelContext> promise = new Promise<>();
+            addTask(() -> doRegister(channel, ops, initializer, promise));
+            return promise;
         }
     }
 
-    private void doRegister(SelectableChannel channel, int ops, ChannelContext channelContext) throws ClosedChannelException {
-        SelectionKey selectionKey = channel.register(this.selector, ops, channelContext);
-        channelContext.setSelectionKey(selectionKey);
+    private void doRegister(SelectableChannel channel, int ops, ChannelInitializer initializer, Promise<ChannelContext> promise) {
+        try {
+            SelectionKey selectionKey = channel.register(this.selector, ops);
+            ChannelPipeline pipeline = new ChannelPipeline();
+            ChannelContext ctx = new ChannelContext(channel, selectionKey, pipeline);
+            initializer.initChannel(ctx, channel);
+            selectionKey.attach(ctx);
+            promise.success(ctx);
+        } catch (Throwable t) {
+            promise.failure(t);
+        }
     }
 
     public void addTask(Runnable runnable) {
@@ -101,4 +107,7 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
     public SingleThreadEventLoop() throws IOException {
         this.selector = Selector.open();
     }
+
+
+
 }

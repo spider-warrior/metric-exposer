@@ -28,7 +28,7 @@ public class DiscMetricChannelHandler extends AbstractChannelHandler {
                 }
             }
         } else {
-            ctx.getChannelPipeline().invokeNextChannelRead(msg);
+            ctx.getPipeline().invokeNextChannelRead(ctx, msg);
         }
     }
     public DiscMetricChannelHandler(SystemInfoRepository systemInfoRepository) {

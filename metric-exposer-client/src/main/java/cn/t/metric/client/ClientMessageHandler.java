@@ -33,9 +33,9 @@ public class ClientMessageHandler {
                     cmdResponse.setSuccess(false);
                     cmdResponse.setOutput(ExceptionUtil.getErrorMessage(e));
                 }
-                ctx.getChannelPipeline().invokeChannelWrite(cmdResponse);
+                ctx.getPipeline().invokeChannelWrite(ctx, cmdResponse);
             } else {
-                ctx.getChannelPipeline().invokeNextChannelRead(msg);
+                ctx.getPipeline().invokeNextChannelRead(ctx, msg);
             }
         }
     }

@@ -92,7 +92,8 @@ public class MetricExposerServer {
         socketChannel.configureBlocking(false);
         socketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, false);
         socketChannel.setOption(StandardSocketOptions.TCP_NODELAY, false);
-        ChannelContext channelContext = new ChannelContext(socketChannel);
+//        ChannelContext channelContext = new ChannelContext(socketChannel);
+        ChannelContext channelContext = null;
         socketChannel.register(key.selector(), SelectionKey.OP_READ, channelContext);
     }
 
@@ -110,7 +111,7 @@ public class MetricExposerServer {
                 if(message == null) {
                     break;
                 } else {
-                    ctx.getChannelPipeline().invokeChannelRead(message);
+                    ctx.getPipeline().invokeChannelRead(ctx, message);
                 }
             }
             //convert to write mode

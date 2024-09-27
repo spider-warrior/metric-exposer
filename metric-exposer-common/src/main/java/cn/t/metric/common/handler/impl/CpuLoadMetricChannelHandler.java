@@ -21,7 +21,7 @@ public class CpuLoadMetricChannelHandler extends AbstractChannelHandler {
             systemInfo.setSystemCpuLoad(((CpuLoadMetric)msg).getSystemCpuLoad());
             systemInfo.setSystemCpuLoadAverage(((CpuLoadMetric)msg).getSystemCpuLoadAverage());
         } else {
-            ctx.getChannelPipeline().invokeNextChannelRead(msg);
+            ctx.getPipeline().invokeNextChannelRead(ctx, msg);
         }
     }
 

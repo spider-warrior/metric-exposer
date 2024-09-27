@@ -34,7 +34,8 @@ public class MetricExposerClient {
             while (loopRead) {
                 try(SocketChannel socketChannel = connect(serverHost, serverPort)) {
                     status = MetricExposerClientStatus.STARTED;
-                    ctx = new ChannelContext(socketChannel);
+//                    ctx = new ChannelContext(socketChannel);
+                    ctx = null;
 //                    channelContext.addMessageHandlerLast(ClientMessageHandler.handlerList());
                     //注册读取事件监听
                     socketChannel.register(selector, SelectionKey.OP_READ, new HashMap<>());
@@ -97,7 +98,7 @@ public class MetricExposerClient {
                 if(msg == null) {
                     break;
                 } else {
-                    ctx.getChannelPipeline().invokeChannelRead(msg);
+                    ctx.getPipeline().invokeChannelRead(this.ctx, msg);
                 }
             }
             //convert to write mode

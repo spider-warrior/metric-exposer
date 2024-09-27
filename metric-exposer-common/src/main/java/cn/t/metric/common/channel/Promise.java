@@ -60,9 +60,9 @@ public class Promise<V> {
 
     private void notify(PromiseListener<V> listener) {
         if(status == Boolean.TRUE) {
-            listener.success(v);
+            listener.operationComplete(new PromiseFuture<>(v));
         } else if(status == Boolean.FALSE) {
-            listener.failure(throwable);
+            listener.operationComplete(new PromiseFuture<>(throwable));
         } else {
             throw new PromiseNotifyException("should never go here");
         }

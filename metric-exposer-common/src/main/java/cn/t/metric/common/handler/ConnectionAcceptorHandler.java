@@ -1,8 +1,8 @@
 package cn.t.metric.common.handler;
 
+import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.channel.ChannelInitializer;
 import cn.t.metric.common.channel.SingleThreadEventLoop;
-import cn.t.metric.common.channel.ChannelContext;
 
 import java.net.StandardSocketOptions;
 import java.nio.channels.SelectionKey;
@@ -11,7 +11,7 @@ import java.nio.channels.SocketChannel;
 
 public class ConnectionAcceptorHandler implements ChannelHandler {
 
-    private final ChannelInitializer<SocketChannel> channelInitializer;
+    private final ChannelInitializer channelInitializer;
     private final SingleThreadEventLoop workerLoop;
 
     @Override
@@ -21,13 +21,13 @@ public class ConnectionAcceptorHandler implements ChannelHandler {
         socketChannel.configureBlocking(false);
         socketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, false);
         socketChannel.setOption(StandardSocketOptions.TCP_NODELAY, false);
-        ChannelContext channelContext = new ChannelContext(socketChannel);
-        //初始化channel
-        channelInitializer.initChannel(channelContext, socketChannel);
         //注册读事件
-        workerLoop.register(socketChannel, SelectionKey.OP_READ, channelContext);
-        // 连接就绪
-        ctx.getChannelPipeline().invokeChannelReady();
+        workerLoop.register(socketChannel, SelectionKey.OP_READ, channelInitializer).addListener(future -> {
+            if (future.isSuccess()) {
+                // 连接就绪
+                future.get().getPipeline().invokeChannelReady(future.get());
+            }
+        });
     }
 
     @Override
@@ -36,7 +36,7 @@ public class ConnectionAcceptorHandler implements ChannelHandler {
         System.out.println("channel ready: " + serverSocketChannel);
     }
 
-    public ConnectionAcceptorHandler(ChannelInitializer<SocketChannel> channelInitializer, SingleThreadEventLoop workerLoop) {
+    public ConnectionAcceptorHandler(ChannelInitializer channelInitializer, SingleThreadEventLoop workerLoop) {
         this.channelInitializer = channelInitializer;
         this.workerLoop = workerLoop;
     }

@@ -7,6 +7,7 @@ import cn.t.metric.common.channel.SingleThreadEventLoop;
 import cn.t.metric.common.handler.ChannelHandler;
 import cn.t.metric.common.repository.SystemInfoRepository;
 
+import java.nio.channels.Channel;
 import java.nio.channels.SocketChannel;
 
 public class MetricExposerServerApplication {
@@ -14,13 +15,13 @@ public class MetricExposerServerApplication {
         int bindPrt = 5000;
         String bindAddress = "127.0.0.1";
         SystemInfoRepository systemInfoRepository  = new SystemInfoRepository();
-        ChannelInitializer<SocketChannel> channelInitializer = new ChannelInitializer<SocketChannel>() {
+        ChannelInitializer channelInitializer = new ChannelInitializer() {
             @Override
-            public void initChannel(ChannelContext ctx, SocketChannel ch) throws Exception {
-                ctx.getChannelPipeline().addMessageHandlerLast(new ChannelHandler() {
+            public void initChannel(ChannelContext ctx, Channel ch) throws Exception {
+                ctx.getPipeline().addMessageHandlerLast(new ChannelHandler() {
                     @Override
                     public void ready(ChannelContext ctx) throws Exception {
-                        System.out.println("new connection: " + ch.getRemoteAddress());
+                        System.out.println("new connection: " + ((SocketChannel)ch).getRemoteAddress());
                     }
 
                     @Override

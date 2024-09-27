@@ -28,7 +28,7 @@ public class SystemMetricChannelHandler extends AbstractChannelHandler {
             //网卡网速
             PopulateUtil.populateNetworkInterfaceInfo(systemInfo.getNetworkInterfaceInfoList(), systemMetric.getNetworkMetricList());
         } else {
-            ctx.getChannelPipeline().invokeNextChannelRead(msg);
+            ctx.getPipeline().invokeNextChannelRead(ctx, msg);
         }
     }
     public SystemMetricChannelHandler(SystemInfoRepository systemInfoRepository) {

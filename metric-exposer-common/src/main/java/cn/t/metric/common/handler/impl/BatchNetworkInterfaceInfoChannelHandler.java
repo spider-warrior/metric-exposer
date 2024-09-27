@@ -19,7 +19,7 @@ public class BatchNetworkInterfaceInfoChannelHandler extends AbstractChannelHand
             SystemInfo systemInfo = systemInfoRepository.queryById(socketAddress.getHostString());
             systemInfo.setNetworkInterfaceInfoList(((BatchNetworkInterfaceInfo)msg).getNetworkInterfaceInfoList());
         } else {
-            ctx.getChannelPipeline().invokeNextChannelRead(msg);
+            ctx.getPipeline().invokeNextChannelRead(ctx, msg);
         }
     }
     public BatchNetworkInterfaceInfoChannelHandler(SystemInfoRepository systemInfoRepository) {

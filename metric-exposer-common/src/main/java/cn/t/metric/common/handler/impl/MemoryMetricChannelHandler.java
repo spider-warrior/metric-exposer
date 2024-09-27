@@ -20,7 +20,7 @@ public class MemoryMetricChannelHandler extends AbstractChannelHandler {
             systemInfo.setFreePhysicalMemorySize(((MemoryMetric)msg).getPhysicalMemoryFree());
             systemInfo.setFreeSwapSize(((MemoryMetric)msg).getSwapMemoryFree());
         } else {
-            ctx.getChannelPipeline().invokeNextChannelRead(msg);
+            ctx.getPipeline().invokeNextChannelRead(ctx, msg);
         }
     }
     public MemoryMetricChannelHandler(SystemInfoRepository systemInfoRepository) {

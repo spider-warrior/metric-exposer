@@ -18,7 +18,7 @@ public class BatchNetworkMetricChannelHandler extends AbstractChannelHandler {
             InetSocketAddress socketAddress = (InetSocketAddress)socketChannel.getRemoteAddress();
             PopulateUtil.populateNetworkInterfaceInfo(systemInfoRepository.queryById(socketAddress.getHostString()).getNetworkInterfaceInfoList(), ((BatchNetworkMetric)msg).getNetworkMetricList());
         } else {
-            ctx.getChannelPipeline().invokeNextChannelRead(msg);
+            ctx.getPipeline().invokeNextChannelRead(ctx, msg);
         }
     }
     public BatchNetworkMetricChannelHandler(SystemInfoRepository systemInfoRepository) {

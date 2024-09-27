@@ -1,37 +1,32 @@
 package cn.t.metric.common.bootstrap;
 
-import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.channel.ChannelInitializer;
 import cn.t.metric.common.channel.SingleThreadEventLoop;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 public class ClientBootstrap {
-    public static SocketChannel connect(String serverHost, int serverPort, ChannelInitializer<SocketChannel> channelInitializer, SingleThreadEventLoop workerLoop) throws Exception {
+    public static <C extends SelectableChannel> void connect(String serverHost, int serverPort, ChannelInitializer initializer, SingleThreadEventLoop workerLoop) throws Exception {
         // 连接
         SocketChannel socketChannel = connect(serverHost, serverPort);
-
-        // 构建channelContext
-        ChannelContext ctx = new ChannelContext(socketChannel);
-        channelInitializer.initChannel(ctx, socketChannel);
-
-        // 连接就绪
-        ctx.getChannelPipeline().invokeChannelReady();
-
         // 注册read事件
-        workerLoop.register(socketChannel, SelectionKey.OP_READ, ctx);
-
+        workerLoop.register(socketChannel, SelectionKey.OP_READ, initializer).addListener(future -> {
+            if (future.isSuccess()) {
+                // 连接就绪
+                future.get().invokeChannelReady();
+            }
+        });
         // 启动worker线程
         new Thread(workerLoop).start();
-
-        return socketChannel;
     }
+
     private static SocketChannel connect(String ip, int port) throws IOException {
         SocketChannel socketChannel = SocketChannel.open();
         socketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, false);

@@ -18,7 +18,7 @@ public class BatchDiscMetricChannelHandler extends AbstractChannelHandler {
             InetSocketAddress socketAddress = (InetSocketAddress)socketChannel.getRemoteAddress();
             PopulateUtil.populateDiscInfo(systemInfoRepository.queryById(socketAddress.getHostString()).getDiscInfoList(), ((BatchDiscMetric)msg).getDiscMetricList());
         } else {
-            ctx.getChannelPipeline().invokeNextChannelRead(msg);
+            ctx.getPipeline().invokeNextChannelRead(ctx, msg);
         }
     }
     public BatchDiscMetricChannelHandler(SystemInfoRepository systemInfoRepository) {

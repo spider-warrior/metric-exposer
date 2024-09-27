@@ -14,7 +14,7 @@ public class ChannelContext {
     private final Map<String, Object> attrs = new HashMap<>();
     private final Channel channel;
     private final SelectionKey selectionKey;
-    private final ChannelPipeline channelPipeline;
+    private final ChannelPipeline pipeline;
     private ByteBuffer byteBuffer;
 
     public Channel getChannel() {
@@ -43,17 +43,37 @@ public class ChannelContext {
         this.attrs.put(name, value);
     }
 
-    public ChannelPipeline getChannelPipeline() {
-        return channelPipeline;
+    public ChannelPipeline getPipeline() {
+        return pipeline;
     }
 
     public SelectionKey getSelectionKey() {
         return selectionKey;
     }
 
-    public ChannelContext(Channel channel, SelectionKey selectionKey, ChannelPipeline channelPipeline) {
+    public void invokeChannelReady() {
+        pipeline.invokeChannelReady(this);
+    }
+
+    public void invokeChannelRead(Object msg) {
+        pipeline.invokeChannelRead(this, msg);
+    }
+
+    public void invokeChannelWrite(Object msg) {
+        pipeline.invokeChannelWrite(this, msg);
+    }
+
+    public void invokeChannelClose() {
+        pipeline.invokeChannelClose(this);
+    }
+
+    public void invokeChannelError(Throwable t) {
+        pipeline.invokeChannelError(this, t);
+    }
+
+    public ChannelContext(Channel channel, SelectionKey selectionKey, ChannelPipeline pipeline) {
         this.channel = channel;
         this.selectionKey = selectionKey;
-        this.channelPipeline = channelPipeline;
+        this.pipeline = pipeline;
     }
 }
