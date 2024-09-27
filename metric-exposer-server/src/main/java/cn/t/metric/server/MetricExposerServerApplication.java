@@ -29,6 +29,11 @@ public class MetricExposerServerApplication {
             }
 
             @Override
+            public void close(ChannelContext ctx) throws Exception {
+                System.out.println("close connection: "  + ((SocketChannel)ch).getRemoteAddress());
+            }
+
+            @Override
             public void error(ChannelContext ctx, Throwable t) {
                 System.out.println("error: " + t);
             }
