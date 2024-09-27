@@ -15,11 +15,11 @@ public class ChannelPipeline {
     private Iterator<ChannelHandler> channelWriteIt;
     private Iterator<ChannelHandler> channelCloseIt;
 
-    public void addMessageHandlerLast(ChannelHandler channelHandler) {
+    public void addChannelHandlerLast(ChannelHandler channelHandler) {
         this.channelHandlerList.add(channelHandler);
     }
 
-    public void addMessageHandlerFirst(ChannelHandler channelHandler) {
+    public void addChannelHandlerFirst(ChannelHandler channelHandler) {
         this.channelHandlerList.add(0, channelHandler);
     }
 

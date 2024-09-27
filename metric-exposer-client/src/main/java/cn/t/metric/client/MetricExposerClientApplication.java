@@ -14,7 +14,7 @@ public class MetricExposerClientApplication {
         ChannelInitializer channelInitializer = new ChannelInitializer() {
             @Override
             public void initChannel(ChannelContext ctx, Channel ch) throws Exception {
-                ctx.getPipeline().addMessageHandlerLast(new CmdRequestHandler());
+                ctx.getPipeline().addChannelHandlerLast(new CmdRequestHandler());
             }
         };
         ClientBootstrap.connect(serverHost, serverPort, channelInitializer, new SingleThreadEventLoop());

@@ -12,7 +12,7 @@ public class MetricExposerServerApplication {
     public static void main(String[] args) throws Exception {
         int bindPrt = 5000;
         String bindAddress = "127.0.0.1";
-        ChannelInitializer channelInitializer = (ctx, ch) -> ctx.getPipeline().addMessageHandlerLast(new ChannelHandler() {
+        ChannelInitializer subChannelInitializer = (ctx, ch) -> ctx.getPipeline().addChannelHandlerLast(new ChannelHandler() {
             @Override
             public void ready(ChannelContext ctx) throws Exception {
                 System.out.println("new connection: " + ((SocketChannel)ch).getRemoteAddress());
@@ -38,6 +38,6 @@ public class MetricExposerServerApplication {
                 System.out.println("error: " + t);
             }
         });
-        ServerBootstrap.bind(bindAddress, bindPrt, channelInitializer, new SingleThreadEventLoop(), new SingleThreadEventLoop());
+        ServerBootstrap.bind(bindAddress, bindPrt, subChannelInitializer, new SingleThreadEventLoop(), new SingleThreadEventLoop());
     }
 }
