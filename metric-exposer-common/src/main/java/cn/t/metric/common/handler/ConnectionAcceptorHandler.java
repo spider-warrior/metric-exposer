@@ -16,7 +16,7 @@ public class ConnectionAcceptorHandler implements ChannelHandler {
 
     @Override
     public void read(ChannelContext ctx, Object msg) throws Exception {
-        SocketChannel socketChannel = ((ServerSocketChannel)msg).accept();
+        SocketChannel socketChannel = ((SocketChannel)msg);
         socketChannel.configureBlocking(false);
         socketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, false);
         socketChannel.setOption(StandardSocketOptions.TCP_NODELAY, false);

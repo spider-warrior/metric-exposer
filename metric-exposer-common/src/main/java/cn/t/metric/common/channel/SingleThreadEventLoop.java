@@ -2,6 +2,9 @@ package cn.t.metric.common.channel;
 
 import cn.t.metric.common.constants.EventLoopStatus;
 import cn.t.metric.common.pipeline.ChannelPipeline;
+import cn.t.metric.common.reader.EventReader;
+import cn.t.metric.common.reader.ServerSocketChannelAcceptReader;
+import cn.t.metric.common.reader.SocketChannelByteBufferReader;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.ExceptionUtil;
 
@@ -19,6 +22,8 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
     private final BlockingDeque<Runnable> taskQueue = new LinkedBlockingDeque<>();
     private volatile EventLoopStatus status = EventLoopStatus.NOT_STARTED;
     private final Selector selector;
+    private final EventReader acceptEventReader;
+    private final EventReader readEventReader;
     private volatile Thread thread;
 
     @Override
@@ -41,10 +46,10 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
                                 //todo 连接可写
                             }
                             if(key.isAcceptable()) {
-                                ChannelUtil.getChannelContext(key).invokeChannelRead(key.channel());
+                                ChannelUtil.getChannelContext(key).invokeChannelRead(acceptEventReader.read(key));
                             }
                             if(key.isReadable()) {
-                                ChannelUtil.getChannelContext(key).invokeChannelRead(key);
+                                ChannelUtil.getChannelContext(key).invokeChannelRead(readEventReader.read(key));
                             }
                         } else {
                             // 连接关闭
@@ -109,6 +114,8 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
 
     public SingleThreadEventLoop() throws IOException {
         this.selector = Selector.open();
+        this.acceptEventReader = new ServerSocketChannelAcceptReader();
+        this.readEventReader = new SocketChannelByteBufferReader();
     }
 
 
