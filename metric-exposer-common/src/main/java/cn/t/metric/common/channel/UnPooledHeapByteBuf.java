@@ -58,5 +58,7 @@ public class UnPooledHeapByteBuf {
 //        for (int i = count; i < startIndex + count; i++) {
 //            buf[i] = 0;
 //        }
+        readerIndex = 0;
+        writerIndex = count;
     }
 }
