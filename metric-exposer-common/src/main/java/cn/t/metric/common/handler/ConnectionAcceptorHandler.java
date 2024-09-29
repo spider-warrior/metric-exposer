@@ -10,13 +10,14 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
-public class ConnectionAcceptorHandler implements ChannelHandler<SocketChannel> {
+public class ConnectionAcceptorHandler implements ChannelHandler {
 
     private final ChannelInitializer channelInitializer;
     private final SingleThreadEventLoop workerLoop;
 
     @Override
-    public void read(ChannelContext ctx, SocketChannel socketChannel) throws Exception {
+    public void read(ChannelContext ctx, Object msg) throws Exception {
+        SocketChannel socketChannel = (SocketChannel)msg;
         socketChannel.configureBlocking(false);
         socketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, false);
         socketChannel.setOption(StandardSocketOptions.TCP_NODELAY, false);

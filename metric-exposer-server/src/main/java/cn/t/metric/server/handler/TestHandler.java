@@ -7,14 +7,15 @@ import cn.t.metric.common.util.ExceptionUtil;
 
 import java.nio.channels.SocketChannel;
 
-public class TestHandler implements ChannelHandler<UnPooledHeapByteBuf> {
+public class TestHandler implements ChannelHandler {
     @Override
     public void ready(ChannelContext ctx) throws Exception {
         System.out.println("[channel-ready]accept new connection: " + ((SocketChannel)ctx.getChannel()).getRemoteAddress());
     }
 
     @Override
-    public void read(ChannelContext ctx, UnPooledHeapByteBuf byteBuf) {
+    public void read(ChannelContext ctx, Object msg) {
+        UnPooledHeapByteBuf byteBuf = (UnPooledHeapByteBuf)msg;
 //        if(true) {
 //            throw new RuntimeException("on purpose");
 //        }
