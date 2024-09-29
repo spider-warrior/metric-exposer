@@ -1,10 +1,12 @@
 package cn.t.metric.common.channel;
 
+import cn.t.metric.common.exception.DecodeException;
 import cn.t.metric.common.util.HeapByteBufUtil;
 
 public class UnPooledHeapByteBuf {
     private static final int minExpandEachTimeSize = 1024;
     private static final int maxExpandEachTimeSize = 1024 * 1024;
+    private static final int maxCacheBufSize = 1024 * 1024 * 4;
 
     private byte[] buf;
     //readerIndex <= writerIndex < buf.length
@@ -144,6 +146,9 @@ public class UnPooledHeapByteBuf {
             if(maxRemainWritableBytes >= writeBytes) {
                 compact(readerIndex, writerIndex - readerIndex);
             } else {
+                if(buf.length > maxCacheBufSize) {
+                    throw new DecodeException("cache buf too large");
+                }
                 //扩展字段
                 int expandSize = writeBytes - maxRemainWritableBytes;
                 if(expandSize < maxExpandEachTimeSize) {
