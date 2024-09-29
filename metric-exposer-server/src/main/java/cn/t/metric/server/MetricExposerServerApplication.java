@@ -16,14 +16,14 @@ public class MetricExposerServerApplication {
         ChannelInitializer subChannelInitializer = (ctx, ch) -> ctx.getPipeline().addChannelHandlerLast(new ChannelHandler<UnPooledHeapByteBuf>() {
             @Override
             public void ready(ChannelContext ctx) throws Exception {
-                System.out.println("new connection: " + ((SocketChannel)ch).getRemoteAddress());
+                System.out.println("[channel-ready]accept new connection: " + ((SocketChannel)ch).getRemoteAddress());
             }
 
             @Override
             public void read(ChannelContext ctx, UnPooledHeapByteBuf byteBuf) {
                 byte[] array = new byte[byteBuf.readableBytes()];
                 byteBuf.readBytes(array);
-                System.out.println("read message: " + new String(array));
+                System.out.println("[channel-read]read message: " + new String(array));
             }
 
             @Override
@@ -33,7 +33,7 @@ public class MetricExposerServerApplication {
 
             @Override
             public void close(ChannelContext ctx) throws Exception {
-                System.out.println("close connection: "  + ((SocketChannel)ch).getRemoteAddress());
+                System.out.println("[channel-close]closed connection: "  + ((SocketChannel)ch).getRemoteAddress());
             }
 
             @Override

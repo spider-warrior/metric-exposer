@@ -35,7 +35,7 @@ public class ConnectionAcceptorHandler implements ChannelHandler<SocketChannel> 
     @Override
     public void ready(ChannelContext ctx) {
         ServerSocketChannel serverSocketChannel = (ServerSocketChannel)ctx.getChannel();
-        System.out.println("[channel-ready]server bind port success, channel: " + serverSocketChannel);
+        System.out.println("[channel-ready]bind port success, channel: " + serverSocketChannel);
     }
 
     public ConnectionAcceptorHandler(ChannelInitializer channelInitializer, SingleThreadEventLoop workerLoop) {

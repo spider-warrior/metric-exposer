@@ -65,10 +65,13 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
                                         break;
                                     }
                                 }
-                                ctx.invokeChannelRead(byteBuf);
-                                if(lastReadLength < 0) {
+                                if(lastReadLength > -1) {
+                                    ctx.invokeChannelRead(byteBuf);
+                                } else {
                                     //连接已关闭
                                     ctx.invokeChannelClose();
+                                    //取消注册
+                                    key.cancel();
                                 }
                             }
                         } else {
