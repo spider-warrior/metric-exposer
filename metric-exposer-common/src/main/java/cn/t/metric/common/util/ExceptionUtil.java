@@ -23,7 +23,11 @@ public class ExceptionUtil {
         if(throwable.getCause() != null && throwable.getCause().getMessage() != null) {
             return getErrorMessage(throwable.getCause());
         } else {
-            return throwable.getMessage();
+            if(throwable.getMessage() == null) {
+                return  throwable.getClass().getName();
+            } else {
+                return throwable.getMessage();
+            }
         }
     }
 }

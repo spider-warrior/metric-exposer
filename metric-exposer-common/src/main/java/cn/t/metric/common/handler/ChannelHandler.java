@@ -11,6 +11,6 @@ public interface ChannelHandler {
     }
     default void close(ChannelContext ctx) throws Exception {}
     default void error(ChannelContext ctx, Throwable t) throws Exception {
-        System.out.println(ExceptionUtil.getErrorMessage(t));
+        System.err.println(ExceptionUtil.getStackTrace(t));
     }
 }

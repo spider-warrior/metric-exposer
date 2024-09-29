@@ -14,6 +14,7 @@ public class ChannelPipeline {
     private Iterator<ChannelHandler> channelReadIt;
     private Iterator<ChannelHandler> channelWriteIt;
     private Iterator<ChannelHandler> channelCloseIt;
+    private Iterator<ChannelHandler> channelErrorIt;
 
     public void addChannelHandlerLast(ChannelHandler channelHandler) {
         this.channelHandlerList.add(channelHandler);
@@ -76,13 +77,13 @@ public class ChannelPipeline {
     }
 
     public void invokeChannelError(ChannelContext ctx, Throwable t) {
-        this.channelReadIt = channelHandlerList.iterator();
+        this.channelErrorIt = channelHandlerList.iterator();
         this.invokeNextChannelError(ctx, t);
     }
 
     public void invokeNextChannelError(ChannelContext ctx, Throwable t) {
         try {
-            this.channelReadIt.next().error(ctx, t);
+            this.channelErrorIt.next().error(ctx, t);
         } catch (Throwable subThrowable) {
             invokeNextChannelError(ctx, t);
         }

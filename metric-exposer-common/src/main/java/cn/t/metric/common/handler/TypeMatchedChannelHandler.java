@@ -12,10 +12,10 @@ public abstract class TypeMatchedChannelHandler<I> implements ChannelHandler {
         if(matcher.match(msg)) {
             @SuppressWarnings("unchecked")
             I castedMsg = (I) msg;
-            doRead(castedMsg);
+            doRead(ctx, castedMsg);
         } else {
             ctx.invokeNextChannelRead(msg);
         }
     }
-    public abstract void doRead(I msg) throws Exception;
+    public abstract void doRead(ChannelContext ctx, I msg) throws Exception;
 }
