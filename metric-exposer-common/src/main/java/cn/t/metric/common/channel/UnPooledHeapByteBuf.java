@@ -165,6 +165,7 @@ public class UnPooledHeapByteBuf {
                         lastExpandSize = expandSize;
                     }
                 }
+                System.out.println("缓存buf扩展, 当前大小: " + buf.length + ", 扩展大小: " + expandSize);
                 int newCapacity = buf.length + expandSize;
                 byte[] newBuf = new byte[newCapacity];
                 System.arraycopy(buf, readerIndex, newBuf, 0, writerIndex - readerIndex);
