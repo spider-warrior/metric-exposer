@@ -2,12 +2,12 @@ package cn.t.metric.server;
 
 import cn.t.metric.common.bootstrap.ServerBootstrap;
 import cn.t.metric.common.channel.SingleThreadEventLoop;
-import cn.t.metric.server.handler.ServerHandlerInitializer;
+import cn.t.metric.server.handler.SocketChannelInitializer;
 
 public class MetricExposerServerApplication {
     public static void main(String[] args) throws Exception {
         int bindPrt = 5000;
         String bindAddress = "127.0.0.1";
-        ServerBootstrap.bind(bindAddress, bindPrt, new ServerHandlerInitializer(), new SingleThreadEventLoop(), new SingleThreadEventLoop());
+        ServerBootstrap.bind(bindAddress, bindPrt, new SocketChannelInitializer(), new SingleThreadEventLoop(), new SingleThreadEventLoop());
     }
 }

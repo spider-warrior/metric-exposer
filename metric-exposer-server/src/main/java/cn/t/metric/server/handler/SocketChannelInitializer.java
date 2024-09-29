@@ -5,7 +5,7 @@ import cn.t.metric.common.channel.ChannelInitializer;
 
 import java.nio.channels.Channel;
 
-public class ServerHandlerInitializer implements ChannelInitializer {
+public class SocketChannelInitializer implements ChannelInitializer {
     @Override
     public void initChannel(ChannelContext ctx, Channel ch) throws Exception {
         ctx.getPipeline().addChannelHandlerLast(new TestHandler());
