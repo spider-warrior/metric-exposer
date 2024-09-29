@@ -1,9 +1,8 @@
-package cn.t.metric.server.handler;
+package cn.t.metric.server.channel.handler;
 
 import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.handler.TypeMatchedChannelHandler;
 import cn.t.metric.common.message.HeartBeat;
-import cn.t.metric.common.repository.SystemInfoRepository;
 
 import java.nio.channels.SocketChannel;
 

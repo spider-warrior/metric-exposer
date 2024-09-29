@@ -2,7 +2,7 @@ package cn.t.metric.server;
 
 import cn.t.metric.common.bootstrap.ServerBootstrap;
 import cn.t.metric.common.channel.SingleThreadEventLoop;
-import cn.t.metric.server.handler.SocketChannelInitializer;
+import cn.t.metric.server.channel.SocketChannelInitializer;
 
 public class MetricExposerServerApplication {
     public static void main(String[] args) throws Exception {

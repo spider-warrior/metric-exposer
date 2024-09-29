@@ -1,28 +1,27 @@
-package cn.t.metric.server.handler;
+package cn.t.metric.server.channel.handler;
 
 import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.handler.TypeMatchedChannelHandler;
-import cn.t.metric.common.message.infos.NetworkInterfaceInfo;
 import cn.t.metric.common.message.infos.SystemInfo;
+import cn.t.metric.common.message.metrics.batch.BatchNetworkInterfaceInfo;
 import cn.t.metric.common.repository.SystemInfoRepository;
-import cn.t.metric.common.util.PopulateUtil;
 
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
-public class NetworkInterfaceInfoChannelHandler extends TypeMatchedChannelHandler<NetworkInterfaceInfo> {
+public class BatchNetworkInterfaceInfoChannelHandler extends TypeMatchedChannelHandler<BatchNetworkInterfaceInfo> {
 
     private final SystemInfoRepository systemInfoRepository;
 
     @Override
-    public void doRead(ChannelContext ctx, NetworkInterfaceInfo msg) throws Exception {
+    public void doRead(ChannelContext ctx, BatchNetworkInterfaceInfo msg) throws Exception {
         SocketChannel socketChannel = (SocketChannel)ctx.getChannel();
         InetSocketAddress socketAddress = (InetSocketAddress)socketChannel.getRemoteAddress();
         SystemInfo systemInfo = systemInfoRepository.queryById(socketAddress.getHostString());
-        PopulateUtil.populateNetworkInterfaceInfo(systemInfo, msg);
+        systemInfo.setNetworkInterfaceInfoList((msg).getNetworkInterfaceInfoList());
     }
 
-    public NetworkInterfaceInfoChannelHandler(SystemInfoRepository systemInfoRepository) {
+    public BatchNetworkInterfaceInfoChannelHandler(SystemInfoRepository systemInfoRepository) {
         this.systemInfoRepository = systemInfoRepository;
     }
 }

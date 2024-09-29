@@ -145,6 +145,16 @@ public class UnPooledHeapByteBuf {
         return readerIndex;
     }
 
+    public UnPooledHeapByteBuf readerIndex(int readerIndex) {
+        this.readerIndex = readerIndex;
+        return this;
+    }
+
+    public UnPooledHeapByteBuf writerIndex(int writerIndex) {
+        this.writerIndex = writerIndex;
+        return this;
+    }
+
     public int readableBytes() {
         return writerIndex - readerIndex;
     }

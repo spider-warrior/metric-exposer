@@ -1,4 +1,4 @@
-package cn.t.metric.server.handler;
+package cn.t.metric.server.channel.handler;
 
 import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.handler.TypeMatchedChannelHandler;
@@ -7,7 +7,6 @@ import cn.t.metric.common.message.infos.SystemInfo;
 import cn.t.metric.common.message.metrics.NetworkMetric;
 import cn.t.metric.common.repository.SystemInfoRepository;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 import java.util.List;

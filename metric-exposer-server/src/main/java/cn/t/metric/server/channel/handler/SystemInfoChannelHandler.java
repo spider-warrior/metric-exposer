@@ -1,4 +1,4 @@
-package cn.t.metric.server.handler;
+package cn.t.metric.server.channel.handler;
 
 import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.handler.TypeMatchedChannelHandler;
