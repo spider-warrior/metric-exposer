@@ -3,16 +3,21 @@ package cn.t.metric.common.channel;
 import cn.t.metric.common.exception.DecodeException;
 import cn.t.metric.common.util.HeapByteBufUtil;
 
+import java.nio.ByteBuffer;
+
 public class UnPooledHeapByteBuf {
+
+    private static final int defaultSize = 2048;
+
     private static final int minExpandEachTimeSize = 1024;
     private static final int maxExpandEachTimeSize = 1024 * 1024;
     private static final int maxCacheBufSize = 1024 * 1024 * 4;
 
     private byte[] buf;
     //readerIndex <= writerIndex < buf.length
-    private int readerIndex = 0;
-    private int writerIndex = 0;
-    private int lastExpandSize = 0;
+    private int readerIndex;
+    private int writerIndex;
+    private int lastExpandSize;
 
     public UnPooledHeapByteBuf skipBytes(int length) {
         readerIndex += length;
@@ -124,6 +129,14 @@ public class UnPooledHeapByteBuf {
         return writeBytes(src, 0, src.length);
     }
 
+    public UnPooledHeapByteBuf writeBytes(ByteBuffer src) {
+        int length = src.remaining();
+        ensureWritable(length);
+        src.get(buf, writerIndex, src.remaining());
+        writerIndex += length;
+        return this;
+    }
+
     public int writerIndex() {
         return writerIndex;
     }
@@ -184,5 +197,12 @@ public class UnPooledHeapByteBuf {
 //        }
         readerIndex = 0;
         writerIndex = count;
+    }
+
+    public UnPooledHeapByteBuf() {
+        this.buf = new byte[defaultSize];
+        this.readerIndex = 0;
+        this.writerIndex = 0;
+        this.lastExpandSize = 0;
     }
 }

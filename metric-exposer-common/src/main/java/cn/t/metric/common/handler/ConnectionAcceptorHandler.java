@@ -10,14 +10,13 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
-public class ConnectionAcceptorHandler implements ChannelHandler {
+public class ConnectionAcceptorHandler implements ChannelHandler<SocketChannel> {
 
     private final ChannelInitializer channelInitializer;
     private final SingleThreadEventLoop workerLoop;
 
     @Override
-    public void read(ChannelContext ctx, Object msg) throws Exception {
-        SocketChannel socketChannel = ((SocketChannel)msg);
+    public void read(ChannelContext ctx, SocketChannel socketChannel) throws Exception {
         socketChannel.configureBlocking(false);
         socketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, false);
         socketChannel.setOption(StandardSocketOptions.TCP_NODELAY, false);
@@ -26,7 +25,7 @@ public class ConnectionAcceptorHandler implements ChannelHandler {
             if (future.isSuccess()) {
                 ChannelContext subCtx = future.get();
                 // 初始化缓冲池
-                subCtx.setReadBuffer(ByteBuffer.allocate(4096));
+                subCtx.setReadBuffer(ByteBuffer.allocate(1024 * 1024));
                 // 连接就绪
                 subCtx.invokeChannelReady();
             }
@@ -36,7 +35,7 @@ public class ConnectionAcceptorHandler implements ChannelHandler {
     @Override
     public void ready(ChannelContext ctx) {
         ServerSocketChannel serverSocketChannel = (ServerSocketChannel)ctx.getChannel();
-        System.out.println("channel ready: " + serverSocketChannel);
+        System.out.println("[channel-ready]server bind port success, channel: " + serverSocketChannel);
     }
 
     public ConnectionAcceptorHandler(ChannelInitializer channelInitializer, SingleThreadEventLoop workerLoop) {

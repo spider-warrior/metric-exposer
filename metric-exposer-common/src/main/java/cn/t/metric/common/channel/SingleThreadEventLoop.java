@@ -1,18 +1,15 @@
 package cn.t.metric.common.channel;
 
 import cn.t.metric.common.constants.EventLoopStatus;
+import cn.t.metric.common.exception.UnExpectedException;
 import cn.t.metric.common.pipeline.ChannelPipeline;
-import cn.t.metric.common.reader.EventReader;
-import cn.t.metric.common.reader.ServerSocketChannelAcceptReader;
-import cn.t.metric.common.reader.SocketChannelByteBufferReader;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.ExceptionUtil;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.channels.SelectableChannel;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
+import java.nio.ByteBuffer;
+import java.nio.channels.*;
 import java.util.Iterator;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -20,10 +17,9 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class SingleThreadEventLoop implements Runnable, Closeable {
 
     private final BlockingDeque<Runnable> taskQueue = new LinkedBlockingDeque<>();
+    private final UnPooledHeapByteBuf byteBuf = new UnPooledHeapByteBuf();
     private volatile EventLoopStatus status = EventLoopStatus.NOT_STARTED;
     private final Selector selector;
-    private final EventReader acceptEventReader;
-    private final EventReader readEventReader;
     private volatile Thread thread;
 
     @Override
@@ -46,14 +42,37 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
                                 //todo 连接可写
                             }
                             if(key.isAcceptable()) {
-                                ChannelUtil.getChannelContext(key).invokeChannelRead(acceptEventReader.read(key));
+                                ServerSocketChannel serverSocketChannel = (ServerSocketChannel)key.channel();
+                                ChannelUtil.getChannelContext(key).invokeChannelRead(serverSocketChannel.accept());
                             }
                             if(key.isReadable()) {
-                                ChannelUtil.getChannelContext(key).invokeChannelRead(readEventReader.read(key));
+                                SocketChannel socketChannel = (SocketChannel)key.channel();
+                                ChannelContext ctx = ChannelUtil.getChannelContext(key);
+                                ByteBuffer buffer = ctx.getReadBuffer();
+                                int lastReadLength = 0;
+                                for (int i = 0; i < 5; i++) {
+                                    lastReadLength = socketChannel.read(buffer);
+                                    if (lastReadLength > 0) {
+                                        buffer.flip();
+                                        byteBuf.writeBytes(buffer);
+                                        buffer.clear();
+                                        if(lastReadLength < buffer.capacity()) {
+                                            //消息已读完
+                                            break;
+                                        }
+                                    } else {
+                                        //消息已读完或连接已断开
+                                        break;
+                                    }
+                                }
+                                ctx.invokeChannelRead(byteBuf);
+                                if(lastReadLength < 0) {
+                                    //连接已关闭
+                                    ctx.invokeChannelClose();
+                                }
                             }
                         } else {
-                            // 连接关闭
-                            ChannelUtil.getChannelContext(key).invokeChannelClose();
+                            throw new UnExpectedException("loop key is invalid");
                         }
                     }
                 }
@@ -114,10 +133,6 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
 
     public SingleThreadEventLoop() throws IOException {
         this.selector = Selector.open();
-        this.acceptEventReader = new ServerSocketChannelAcceptReader();
-        this.readEventReader = new SocketChannelByteBufferReader();
     }
-
-
 
 }

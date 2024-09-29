@@ -3,9 +3,9 @@ package cn.t.metric.common.handler;
 import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.util.ExceptionUtil;
 
-public interface ChannelHandler {
+public interface ChannelHandler<T> {
     default void ready(ChannelContext ctx) throws Exception {}
-    void read(ChannelContext channelContext, Object msg) throws Exception;
+    void read(ChannelContext channelContext, T msg) throws Exception;
     default void write(ChannelContext ctx, Object msg) throws Exception {
         ctx.invokeNextChannelWrite(msg);
     }
