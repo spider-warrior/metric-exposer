@@ -2,6 +2,7 @@ package cn.t.metric.common.handler;
 
 import cn.t.metric.common.channel.ChannelContext;
 import cn.t.metric.common.eventloop.SingleThreadEventLoop;
+import cn.t.metric.common.exception.UnExpectedException;
 import cn.t.metric.common.initializer.ChannelInitializer;
 
 import java.net.StandardSocketOptions;
@@ -22,13 +23,15 @@ public class ConnectionAcceptorHandler implements ChannelHandler {
         socketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, false);
         socketChannel.setOption(StandardSocketOptions.TCP_NODELAY, false);
         //注册读事件
-        workerLoop.register(socketChannel, SelectionKey.OP_READ, channelInitializer).addListener(future -> {
+        workerLoop.addTask(() -> workerLoop.register(socketChannel, SelectionKey.OP_READ, channelInitializer), 0).addListener(future -> {
             if (future.isSuccess()) {
                 ChannelContext subCtx = future.get();
                 // 初始化缓冲池
                 subCtx.setReadBuffer(ByteBuffer.allocate(1024 * 1024));
                 // 连接就绪
                 subCtx.invokeChannelReady();
+            } else {
+                throw new UnExpectedException("register read failed");
             }
         });
     }

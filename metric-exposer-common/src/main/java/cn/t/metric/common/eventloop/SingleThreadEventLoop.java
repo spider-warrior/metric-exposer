@@ -140,11 +140,7 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
         return Thread.currentThread() == this.thread;
     }
 
-    public Promise<ChannelContext> register(SelectableChannel channel, int ops, ChannelInitializer initializer) {
-        return addTask(() -> doRegister(channel, ops, initializer), 0);
-    }
-
-    private ChannelContext doRegister(SelectableChannel channel, int ops, ChannelInitializer initializer) throws Exception {
+    public ChannelContext register(SelectableChannel channel, int ops, ChannelInitializer initializer) throws Exception {
         SelectionKey selectionKey = channel.register(this.selector, ops);
         ChannelPipeline pipeline = new ChannelPipeline();
         ChannelContext ctx = new ChannelContext(channel, selectionKey, pipeline);
