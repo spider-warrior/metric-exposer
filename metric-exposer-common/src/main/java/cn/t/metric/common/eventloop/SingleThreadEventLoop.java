@@ -141,9 +141,7 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
     }
 
     public Promise<ChannelContext> register(SelectableChannel channel, int ops, ChannelInitializer initializer) {
-        Promise<ChannelContext> promise = new Promise<>(this);
-        addTask(() -> doRegister(channel, ops, initializer), 0, promise);
-        return promise;
+        return addTask(() -> doRegister(channel, ops, initializer), 0);
     }
 
     private ChannelContext doRegister(SelectableChannel channel, int ops, ChannelInitializer initializer) throws Exception {
@@ -155,15 +153,17 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
         return ctx;
     }
 
-    public <V> void addTask(Callable<V> callable, int delayMills, Promise<V> promise) {
+    public <V> Promise<V> addTask(Callable<V> callable, int delayMills) {
         startThread();
-        long runTime = System.currentTimeMillis() + delayMills;
-        this.taskQueue.add(new EventLoopTask<>(callable, runTime, promise));
+        Promise<V> promise = new Promise<>(this);
+        long deadlineMills = System.currentTimeMillis() + delayMills;
+        this.taskQueue.add(new EventLoopTask<>(callable, deadlineMills, promise));
         //如果任务需要立即执行且selector未被唤醒
-        if(runTime < nextTaskExecuteTime && taskAwakeUp.compareAndSet(false, true)) {
+        if(deadlineMills < nextTaskExecuteTime && taskAwakeUp.compareAndSet(false, true)) {
             //多线程会调用多次wakeup，且当selector未阻塞在select方法时被调用wakeup方法，那么当selector下次调用select方法时会直接返回。selectNow()可以清理掉之前任何调用wakeup带来的影响。
             this.selector.wakeup();
         }
+        return promise;
     }
 
     private void startThread() {

@@ -5,8 +5,6 @@ import cn.t.metric.common.exception.PromiseNotifyException;
 
 public class Promise<V> {
 
-    private static final Promise<Void> noOp = new Promise<>(null);
-
     private final SingleThreadEventLoop eventLoop;
     private volatile Boolean status;
     private volatile V v;
@@ -52,7 +50,7 @@ public class Promise<V> {
                 notify(listener);
             }
             return null;
-        }, 0, noOp);
+        }, 0);
         return this;
     }
 
