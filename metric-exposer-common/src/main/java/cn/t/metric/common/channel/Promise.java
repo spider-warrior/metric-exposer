@@ -6,11 +6,11 @@ import cn.t.metric.common.exception.PromiseNotifyException;
 public class Promise<V> {
 
     private final SingleThreadEventLoop eventLoop;
-    private volatile Boolean status;
-    private volatile V v;
-    private volatile Throwable throwable;
-    private volatile PromiseListenerNode<V> firstNode;
-    private volatile PromiseListenerNode<V> currentNode;
+    private Boolean status;
+    private V v;
+    private Throwable throwable;
+    private PromiseListenerNode<V> firstNode;
+    private PromiseListenerNode<V> currentNode;
     public void success(V v) {
         this.v = v;
         this.status = Boolean.TRUE;
