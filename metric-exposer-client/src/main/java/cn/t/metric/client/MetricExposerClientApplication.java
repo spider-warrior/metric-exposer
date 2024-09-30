@@ -2,7 +2,7 @@ package cn.t.metric.client;
 
 import cn.t.metric.client.channel.SocketChannelInitializer;
 import cn.t.metric.common.bootstrap.ClientBootstrap;
-import cn.t.metric.common.channel.SingleThreadEventLoop;
+import cn.t.metric.common.eventloop.SingleThreadEventLoop;
 
 public class MetricExposerClientApplication {
     public static void main(String[] args) throws Exception {

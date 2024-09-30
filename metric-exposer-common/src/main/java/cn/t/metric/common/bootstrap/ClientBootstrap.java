@@ -1,19 +1,18 @@
 package cn.t.metric.common.bootstrap;
 
-import cn.t.metric.common.channel.ChannelInitializer;
-import cn.t.metric.common.channel.SingleThreadEventLoop;
+import cn.t.metric.common.initializer.ChannelInitializer;
+import cn.t.metric.common.eventloop.SingleThreadEventLoop;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
-import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 public class ClientBootstrap {
-    public static <C extends SelectableChannel> void connect(String serverHost, int serverPort, ChannelInitializer initializer, SingleThreadEventLoop workerLoop) throws Exception {
+    public static void connect(String serverHost, int serverPort, ChannelInitializer initializer, SingleThreadEventLoop workerLoop) throws Exception {
         // 连接
         SocketChannel socketChannel = connect(serverHost, serverPort);
         // 注册read事件

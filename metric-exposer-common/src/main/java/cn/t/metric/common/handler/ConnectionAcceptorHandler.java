@@ -1,8 +1,8 @@
 package cn.t.metric.common.handler;
 
 import cn.t.metric.common.channel.ChannelContext;
-import cn.t.metric.common.channel.ChannelInitializer;
-import cn.t.metric.common.channel.SingleThreadEventLoop;
+import cn.t.metric.common.eventloop.SingleThreadEventLoop;
+import cn.t.metric.common.initializer.ChannelInitializer;
 
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;

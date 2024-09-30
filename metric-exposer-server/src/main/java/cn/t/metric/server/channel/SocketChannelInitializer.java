@@ -1,7 +1,7 @@
 package cn.t.metric.server.channel;
 
 import cn.t.metric.common.channel.ChannelContext;
-import cn.t.metric.common.channel.ChannelInitializer;
+import cn.t.metric.common.initializer.ChannelInitializer;
 import cn.t.metric.common.repository.SystemInfoRepository;
 import cn.t.metric.server.channel.handler.*;
 

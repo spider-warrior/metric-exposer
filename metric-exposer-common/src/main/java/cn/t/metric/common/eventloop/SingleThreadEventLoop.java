@@ -1,7 +1,11 @@
-package cn.t.metric.common.channel;
+package cn.t.metric.common.eventloop;
 
+import cn.t.metric.common.channel.ChannelContext;
+import cn.t.metric.common.channel.Promise;
+import cn.t.metric.common.channel.UnPooledHeapByteBuf;
 import cn.t.metric.common.constants.EventLoopStatus;
 import cn.t.metric.common.exception.UnExpectedException;
+import cn.t.metric.common.initializer.ChannelInitializer;
 import cn.t.metric.common.pipeline.ChannelPipeline;
 import cn.t.metric.common.util.ChannelUtil;
 import cn.t.metric.common.util.ExceptionUtil;
@@ -11,16 +15,19 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.Iterator;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class SingleThreadEventLoop implements Runnable, Closeable {
 
-    private final BlockingDeque<Runnable> taskQueue = new LinkedBlockingDeque<>();
+    private static final long defaultNextSelectTimeout = 3000;
+
+    private final PriorityBlockingQueue<EventLoopTask> taskQueue = new PriorityBlockingQueue<>();
     private final UnPooledHeapByteBuf byteBuf = new UnPooledHeapByteBuf();
     private volatile EventLoopStatus status = EventLoopStatus.NOT_STARTED;
     private final Selector selector;
     private volatile Thread thread;
+    private long nextSelectTimeout = defaultNextSelectTimeout;
+    private volatile long nextTaskExecuteTime;
 
     @Override
     public void run() {
@@ -28,7 +35,7 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
         status = EventLoopStatus.STARTED;
         try {
             while (status == EventLoopStatus.STARTED) {
-                int count = selector.select(3000);
+                int count = selector.select(nextSelectTimeout);
                 if(count > 0) {
                     Iterator<SelectionKey> it = selector.selectedKeys().iterator();
                     while (it.hasNext()) {
@@ -79,11 +86,30 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
                         }
                     }
                 }
-                while(!taskQueue.isEmpty()) {
-                    Runnable runnable = taskQueue.poll();
-                    if(runnable != null) {
-                        runnable.run();
+                if(!taskQueue.isEmpty()) {
+                    while (true) {
+                        long now = System.currentTimeMillis();
+                        EventLoopTask task = taskQueue.peek();
+                        if(task != null) {
+                            //允许5毫秒抖动
+                            if(task.getDeadlineMills() <= now + 5) {
+                                taskQueue.remove().getCommand().run();
+                            } else {
+                                //剩余任务需要下次执行，根据下个任务执行之间设置select策略
+                                nextTaskExecuteTime = task.getDeadlineMills();
+                                nextSelectTimeout = nextTaskExecuteTime - now;
+                                break;
+                            }
+                        } else {
+                            //任务执行完毕，执行默认select策略
+                            nextTaskExecuteTime = now + defaultNextSelectTimeout;
+                            nextSelectTimeout = defaultNextSelectTimeout;
+                        }
                     }
+                } else {
+                    //任务为空，执行默认select策略
+                    nextTaskExecuteTime = System.currentTimeMillis() + defaultNextSelectTimeout;
+                    nextSelectTimeout = defaultNextSelectTimeout;
                 }
             }
         } catch (Throwable t) {
@@ -110,7 +136,7 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
             return promise;
         } else {
             Promise<ChannelContext> promise = new Promise<>();
-            addTask(() -> doRegister(channel, ops, initializer, promise));
+            addTask(() -> doRegister(channel, ops, initializer, promise), 0);
             return promise;
         }
     }
@@ -128,10 +154,14 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
         }
     }
 
-    public void addTask(Runnable runnable) {
-        this.taskQueue.add(runnable);
-        //todo 多线程会调用多次wakeup，且当selector未阻塞在select方法时被调用wakeup方法，那么当selector下次调用select方法时会直接返回。selectNow()可以清理掉之前任何调用wakeup带来的影响。
-        this.selector.wakeup();
+    public void addTask(Runnable runnable, int delayMills) {
+        long runTime = System.currentTimeMillis() + delayMills;
+        this.taskQueue.add(new EventLoopTask(runnable, runTime));
+        //立即执行任务或任务执行时间早于下次任务执行时间, 此时可能任务正在执行中，暂时没考虑该情况
+        if(runTime < nextTaskExecuteTime) {
+            //todo 多线程会调用多次wakeup，且当selector未阻塞在select方法时被调用wakeup方法，那么当selector下次调用select方法时会直接返回。selectNow()可以清理掉之前任何调用wakeup带来的影响。
+            this.selector.wakeup();
+        }
     }
 
     public SingleThreadEventLoop() throws IOException {

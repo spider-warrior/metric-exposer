@@ -2,7 +2,7 @@ package cn.t.metric.client.channel;
 
 import cn.t.metric.client.CmdRequestHandler;
 import cn.t.metric.common.channel.ChannelContext;
-import cn.t.metric.common.channel.ChannelInitializer;
+import cn.t.metric.common.initializer.ChannelInitializer;
 
 import java.nio.channels.Channel;
 
