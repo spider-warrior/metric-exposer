@@ -1,9 +1,9 @@
 package cn.t.metric.common.bootstrap;
 
-import cn.t.metric.common.initializer.ChannelInitializer;
-import cn.t.metric.common.initializer.ServerSocketChannelInitializer;
 import cn.t.metric.common.eventloop.SingleThreadEventLoop;
 import cn.t.metric.common.exception.UnExpectedException;
+import cn.t.metric.common.initializer.ChannelInitializer;
+import cn.t.metric.common.initializer.ServerSocketChannelInitializer;
 
 import java.net.InetSocketAddress;
 import java.net.StandardSocketOptions;
@@ -26,9 +26,5 @@ public class ServerBootstrap {
                 throw new UnExpectedException("register accept failed");
             }
         });
-        // 启动accept线程
-        new Thread(acceptLoop, "accept-thread").start();
-        // 启动worker线程
-        new Thread(workerLoop, "worker-thread").start();
     }
 }

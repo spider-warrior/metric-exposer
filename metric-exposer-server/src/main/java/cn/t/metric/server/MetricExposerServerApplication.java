@@ -8,6 +8,6 @@ public class MetricExposerServerApplication {
     public static void main(String[] args) throws Exception {
         int bindPrt = 5000;
         String bindAddress = "127.0.0.1";
-        ServerBootstrap.bind(bindAddress, bindPrt, new SocketChannelInitializer(), new SingleThreadEventLoop(), new SingleThreadEventLoop());
+        ServerBootstrap.bind(bindAddress, bindPrt, new SocketChannelInitializer(), new SingleThreadEventLoop("accept"), new SingleThreadEventLoop("io-loop"));
     }
 }

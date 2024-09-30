@@ -5,7 +5,6 @@ import cn.t.metric.common.exception.PromiseNotifyException;
 public class Promise<V> {
     private volatile Boolean status;
     private volatile V v;
-    private volatile PromiseListenerNode<?> lastLoopNode;
     private volatile Throwable throwable;
     private volatile PromiseListenerNode<V> firstNode;
     private volatile PromiseListenerNode<V> currentNode;
@@ -23,14 +22,14 @@ public class Promise<V> {
         if(firstNode != null) {
             PromiseListenerNode<V> current = firstNode;
             while(true) {
-                current.executed();
-                notify(current.getListener());
-                PromiseListenerNode<V> next = current.getNext();
-                if(next == null) {
-                    lastLoopNode = current;
-                    break;
+                if(current.tryConsume()) {
+                    notify(current.getListener());
+                    PromiseListenerNode<V> next = current.getNext();
+                    if(next == null) {
+                        break;
+                    }
+                    current = next;
                 }
-                current = next;
             }
         }
     }
@@ -45,15 +44,13 @@ public class Promise<V> {
             this.currentNode = newNode;
             //二次检查发送状态, 如果此时已有响应结果有可能遗漏当前listener执行
             if(status != null) {
-                //lastLoopNode不为空说明已循环通知完毕
-                if(lastLoopNode != null) {
-                    //此时检查newNode状态，如果未执行则立即执行（lastLoopNode晚于node.setExecuted(true)执行, 如果lastLoopNode不为空则确定node的execute一定被设置）
-                    if(!newNode.isExecuted()) {
-                        notify(listener);
-                    }
+                //争抢式执行
+                if(newNode.tryConsume()) {
+                    notify(newNode.getListener());
                 }
             }
         } else {
+            System.out.printf("[%s]addListener: 立即执行%n", Thread.currentThread().getName());
             notify(listener);
         }
     }

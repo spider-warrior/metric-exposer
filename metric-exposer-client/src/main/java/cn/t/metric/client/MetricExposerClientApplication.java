@@ -8,6 +8,6 @@ public class MetricExposerClientApplication {
     public static void main(String[] args) throws Exception {
         String serverHost = "127.0.0.1";
         int serverPort = 5000;
-        ClientBootstrap.connect(serverHost, serverPort, new SocketChannelInitializer(), new SingleThreadEventLoop());
+        ClientBootstrap.connect(serverHost, serverPort, new SocketChannelInitializer(), new SingleThreadEventLoop("io-loop"));
     }
 }
