@@ -14,6 +14,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -21,13 +22,13 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
 
     private static final long defaultNextSelectTimeout = 3000;
 
-    private final PriorityBlockingQueue<EventLoopTask> taskQueue = new PriorityBlockingQueue<>();
+    private final PriorityBlockingQueue<EventLoopTask> taskQueue = new PriorityBlockingQueue<>(10, Comparator.comparingLong(EventLoopTask::getDeadlineMills));
     private final UnPooledHeapByteBuf byteBuf = new UnPooledHeapByteBuf();
     private volatile EventLoopStatus status = EventLoopStatus.NOT_STARTED;
     private final Selector selector;
     private volatile Thread thread;
     private long nextSelectTimeout = defaultNextSelectTimeout;
-    private volatile long nextTaskExecuteTime;
+    private volatile long nextTaskExecuteTime = Long.MAX_VALUE;
 
     @Override
     public void run() {
