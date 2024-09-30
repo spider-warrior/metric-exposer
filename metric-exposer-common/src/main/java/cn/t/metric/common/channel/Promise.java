@@ -1,8 +1,13 @@
 package cn.t.metric.common.channel;
 
+import cn.t.metric.common.eventloop.SingleThreadEventLoop;
 import cn.t.metric.common.exception.PromiseNotifyException;
 
 public class Promise<V> {
+
+    private static final Promise<Void> noOp = new Promise<>(null);
+
+    private final SingleThreadEventLoop eventLoop;
     private volatile Boolean status;
     private volatile V v;
     private volatile Throwable throwable;
@@ -33,26 +38,22 @@ public class Promise<V> {
             }
         }
     }
-    public void addListener(PromiseListener<V> listener) {
-        if(status == null) {
-            PromiseListenerNode<V> newNode = new PromiseListenerNode<>(listener);
-            if(this.firstNode == null) {
-                this.firstNode = newNode;
-            } else {
-                this.currentNode.setNext(newNode);
-            }
-            this.currentNode = newNode;
-            //二次检查发送状态, 如果此时已有响应结果有可能遗漏当前listener执行
-            if(status != null) {
-                //争抢式执行
-                if(newNode.tryConsume()) {
-                    notify(newNode.getListener());
+    public Promise<V> addListener(PromiseListener<V> listener) {
+        this.eventLoop.addTask(() -> {
+            if(status == null) {
+                PromiseListenerNode<V> newNode = new PromiseListenerNode<>(listener);
+                if(this.firstNode == null) {
+                    this.firstNode = newNode;
+                } else {
+                    this.currentNode.setNext(newNode);
                 }
+                this.currentNode = newNode;
+            } else {
+                notify(listener);
             }
-        } else {
-            System.out.printf("[%s]addListener: 立即执行%n", Thread.currentThread().getName());
-            notify(listener);
-        }
+            return null;
+        }, 0, noOp);
+        return this;
     }
 
     private void notify(PromiseListener<V> listener) {
@@ -63,5 +64,9 @@ public class Promise<V> {
         } else {
             throw new PromiseNotifyException("should never go here");
         }
+    }
+
+    public Promise(SingleThreadEventLoop eventLoop) {
+        this.eventLoop = eventLoop;
     }
 }

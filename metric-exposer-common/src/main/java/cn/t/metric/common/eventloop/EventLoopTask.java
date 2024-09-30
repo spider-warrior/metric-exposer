@@ -14,10 +14,6 @@ public class EventLoopTask<V> {
         return deadlineMills;
     }
 
-    public Promise<V> getPromise() {
-        return promise;
-    }
-
     public void run() {
         try {
             V v = command.call();

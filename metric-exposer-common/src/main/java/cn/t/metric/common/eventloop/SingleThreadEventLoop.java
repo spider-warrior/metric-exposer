@@ -26,7 +26,7 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
     private static final AtomicIntegerFieldUpdater<SingleThreadEventLoop> STATE_UPDATER = AtomicIntegerFieldUpdater.newUpdater(SingleThreadEventLoop.class, "state");
 
     private static final boolean AWAKE = false;
-    private static final long defaultNextSelectTimeout = 3000;
+    private static final long defaultNextSelectTimeout = 30000;
 
     private final PriorityBlockingQueue<EventLoopTask<?>> taskQueue = new PriorityBlockingQueue<>(10, Comparator.comparingLong(EventLoopTask::getDeadlineMills));
     private final UnPooledHeapByteBuf byteBuf = new UnPooledHeapByteBuf();
@@ -116,6 +116,7 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
                             break;
                         }
                     }
+                    taskAwakeUp.set(false);
                 } else {
                     //任务为空，执行默认select策略
                     nextTaskExecuteTime = System.currentTimeMillis() + defaultNextSelectTimeout;
@@ -135,12 +136,12 @@ public class SingleThreadEventLoop implements Runnable, Closeable {
         this.state = EventLoopState.SHUTTING_DOWN;
     }
 
-    public boolean inEventLoop(Thread thread) {
-        return thread == this.thread;
+    public boolean inEventLoop() {
+        return Thread.currentThread() == this.thread;
     }
 
     public Promise<ChannelContext> register(SelectableChannel channel, int ops, ChannelInitializer initializer) {
-        Promise<ChannelContext> promise = new Promise<>();
+        Promise<ChannelContext> promise = new Promise<>(this);
         addTask(() -> doRegister(channel, ops, initializer), 0, promise);
         return promise;
     }
